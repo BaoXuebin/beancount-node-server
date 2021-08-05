@@ -1,10 +1,10 @@
 const fs = require('fs');
-const accounts = require('./_cache/accounts.json')
-const config = require('./config.json')
+const accounts = require('../cache/accounts.json')
+const config = require('../config/config.json')
 const { readFileByLines, lineToMap } = require('./utils')
 
 const initAccount = () => {
-  const accountCacheFilePath = './_cache/accounts.json'
+  const accountCacheFilePath = './cache/accounts.json'
   const beanAccountFiles = fs.readdirSync(`${config.dataPath}/account`)
   let accounts = []
   beanAccountFiles.forEach(beanAccountFile => {

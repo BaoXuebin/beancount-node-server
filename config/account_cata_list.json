@@ -1,0 +1,84 @@
+{
+  "Assets": [
+    {
+      "key": "EBank",
+      "name": "电子支付"
+    },
+    {
+      "key": "Bank",
+      "name": "银行卡"
+    },
+    {
+      "key": "Cash",
+      "name": "现金"
+    },
+    {
+      "key": "Other",
+      "name": "其他"
+    }
+  ],
+  "Expenses": [
+    {
+      "key": "Food",
+      "name": "餐饮"
+    },
+    {
+      "key": "House",
+      "name": "住房"
+    },
+    {
+      "key": "Shopping",
+      "name": "购物"
+    },
+    {
+      "key": "Travel",
+      "name": "出行"
+    },
+    {
+      "key": "Subscribe",
+      "name": "订阅"
+    },
+    {
+      "key": "Other",
+      "name": "其他"
+    }
+  ],
+  "Equity": [
+    {
+      "key": "Balance",
+      "name": "账户"
+    },
+    {
+      "key": "Other",
+      "name": "其他"
+    }
+  ],
+  "Liabilities": [
+    {
+      "key": "Debt",
+      "name": "债务"
+    },
+    {
+      "key": "Claims",
+      "name": "债权"
+    },
+    {
+      "key": "Other",
+      "name": "其他"
+    }
+  ],
+  "Income": [
+    {
+      "key": "Work",
+      "name": "工作"
+    },
+    {
+      "key": "Invest",
+      "name": "投资"
+    },
+    {
+      "key": "Other",
+      "name": "其他"
+    }
+  ]
+}

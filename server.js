@@ -1,7 +1,6 @@
 const express = require('express')
-const { isBlank, validateAccountType } = require('./validate')
-const { initAccount, getAccountLike, addAcount } = require('./api')
-const e = require('express')
+const { isBlank, validateAccountType } = require('./js/validate')
+const { initAccount, getAccountLike, addAcount } = require('./js/api')
 
 // 初始化 account
 initAccount()

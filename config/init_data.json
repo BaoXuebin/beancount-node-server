@@ -1,0 +1,38 @@
+{
+  "assets": [
+    "Assets:EBank:支付宝",
+    "Assets:EBank:微信支付",
+    "Assets:Cash:现金"
+  ],
+  "expenses": [
+    "Expenses:Food:早餐",
+    "Expenses:Food:午餐",
+    "Expenses:Food:晚餐",
+    "Expenses:Travel:公交地铁",
+    "Expenses:Travel:出租车",
+    "Expenses:Travel:火车",
+    "Expenses:Travel:飞机",
+    "Expenses:Shopping:衣服鞋袜",
+    "Expenses:Shopping:购物",
+    "Expenses:Shopping:零食水果",
+    "Expenses:House:房租",
+    "Expenses:House:房贷",
+    "Expenses:House:水煤气",
+    "Expenses:Subscribe:手机话费",
+    "Expenses:Subscribe:会员订阅",
+    "Expenses:Other:红包转账"
+  ],
+  "income": [
+    "Income:Work:工作收入",
+    "Income:Invest:投资收益",
+    "Income:Other:睡后收入"
+  ],
+  "equity": [
+    "Equity:Balance:账户中和"
+  ],
+  "liabilities": [
+    "Liabilities:Debt:花呗",
+    "Liabilities:Debt:信用卡",
+    "Liabilities:Claims:朋友欠款"
+  ]
+}
