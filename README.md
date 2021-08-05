@@ -1,4 +1,4 @@
-# beancount-service
+# beancount-node-server
 
 ## 介绍
 
