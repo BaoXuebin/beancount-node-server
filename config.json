@@ -1,0 +1,5 @@
+{
+  "title": "我的账本",
+  "dataPath": "./data",
+  "operatingCurrency": "CNY"
+}
