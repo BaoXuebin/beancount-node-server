@@ -1,3 +1,4 @@
+const dayjs = require('dayjs');
 const fs = require('fs');
 const accounts = require('../cache/accounts.json')
 const config = require('../config/config.json')
@@ -21,7 +22,7 @@ const getAccountLike = (key) => {
   return accounts.filter(account => account.includes(key))
 }
 
-const addAcount = (account) => {
+const addAccount = (account) => {
   const { type, cata, date, value } = account
   let str;
   if (cata) {
@@ -33,8 +34,26 @@ const addAcount = (account) => {
   return str
 }
 
+const addEntry = (entry) => {
+  const { date, store, desc, entries } = entry
+  let str = `${date} * "${store || ''}" "${desc}"\r\n`;
+  entries.forEach(e => {
+    str += `  ${e.account} ${Number(e.amount).toFixed(2)} ${config.operatingCurrency}\r\n`
+  })
+  const currentMonth = dayjs().format("YYYY-MM");
+  const monthBeanFile = `${config.dataPath}/month/${currentMonth}.bean`;
+  // 月度账单不存在，则创建
+  if (!fs.existsSync(monthBeanFile)) {
+    fs.writeFileSync(monthBeanFile, '')
+    fs.appendFileSync(`${config.dataPath}/index.bean`, `include "./month/${currentMonth}.bean"\r\n`)
+  }
+  fs.appendFileSync(`${config.dataPath}/month/${dayjs().format("YYYY-MM")}.bean`, `${str}\r\n`)
+  return str;
+}
+
 module.exports = {
   initAccount,
   getAccountLike,
-  addAcount
+  addAccount,
+  addEntry
 }
