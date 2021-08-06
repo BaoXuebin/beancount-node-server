@@ -1,5 +1,6 @@
 const dayjs = require('dayjs');
 const fs = require('fs');
+const process = require('child_process')
 const accounts = require('../cache/accounts.json')
 const config = require('../config/config.json')
 const { readFileByLines, lineToMap } = require('./utils')
@@ -14,7 +15,6 @@ const initAccount = () => {
     const fileAccountWords = fileAccounts.filter(fa => !closeAccountSet.has(fa.account)).map(a => a.account)
     accounts = accounts.concat(fileAccountWords)
   })
-
   fs.writeFileSync(accountCacheFilePath, JSON.stringify(accounts))
 }
 
@@ -51,9 +51,27 @@ const addEntry = (entry) => {
   return str;
 }
 
+const statsMonth = (year, month) => {
+  const bql = `SELECT root(account, 1), ABS(sum(position)) as total FROM year = ${year} and month = ${month} WHERE account ~ 'Income' OR account ~ 'Expenses' OR account ~ 'Liabilities' GROUP BY root(account, 1)`;
+  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResultSet = bqlResult.split('\n').splice(2);
+  let result = [];
+  let obj;
+  bqlResultSet.forEach(r => {
+    const arr = r.trim().split(/\s+/)
+    if (arr.length === 3) {
+      obj = {}
+      obj[arr[0]] = arr[1]
+      result.push(obj)
+    }
+  });
+  return result;
+}
+
 module.exports = {
   initAccount,
   getAccountLike,
   addAccount,
-  addEntry
+  addEntry,
+  statsMonth
 }

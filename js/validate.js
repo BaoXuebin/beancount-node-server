@@ -21,7 +21,16 @@ const validateAccountType = (type) => {
   return null;
 }
 
+const isBalance = (entries) => {
+  let sum = 0;
+  entries.forEach(e => {
+    sum += Number(e.amount)
+  })
+  return sum === 0
+}
+
 module.exports = {
   isBlank,
+  isBalance,
   validateAccountType
 }
