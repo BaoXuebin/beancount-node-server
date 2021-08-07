@@ -18,6 +18,8 @@ const initAccount = () => {
   fs.writeFileSync(accountCacheFilePath, JSON.stringify(accounts))
 }
 
+const getAllAcount = () => accounts
+
 const getAccountLike = (key) => {
   return accounts.filter(account => account.includes(key))
 }
@@ -35,8 +37,8 @@ const addAccount = (account) => {
 }
 
 const addEntry = (entry) => {
-  const { date, store, desc, entries } = entry
-  let str = `${date} * "${store || ''}" "${desc}"\r\n`;
+  const { date, payee, desc, entries } = entry
+  let str = `${date} * "${payee || ''}" "${desc}"\r\n`;
   entries.forEach(e => {
     str += `  ${e.account} ${Number(e.amount).toFixed(2)} ${config.operatingCurrency}\r\n`
   })
@@ -70,6 +72,7 @@ const statsMonth = (year, month) => {
 
 module.exports = {
   initAccount,
+  getAllAcount,
   getAccountLike,
   addAccount,
   addEntry,
