@@ -19,7 +19,32 @@ const lineToMap = account => {
   }
 }
 
+const getAccountCata = account => {
+  const array = account.split(':')
+  if (array && array.length >= 1) {
+    return account.split(':')[0]
+  }
+  return ''
+}
+const getAccountType = account => {
+  const array = account.split(':')
+  if (array && array.length >= 2) {
+    return account.split(':')[1]
+  }
+  return ''
+}
+const getAccountName = account => {
+  const array = account.split(':')
+  if (array && array.length >= 3) {
+    return account.split(':')[2]
+  }
+  return ''
+}
+
 module.exports = {
   readFileByLines,
-  lineToMap
+  lineToMap,
+  getAccountCata,
+  getAccountType,
+  getAccountName
 }

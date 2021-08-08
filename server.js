@@ -1,7 +1,8 @@
 const express = require('express')
-const { isBlank, validateAccountType, isBalance } = require('./js/validate')
-const { initAccount, getAccountLike, getAllAcount, addAccount, addEntry, statsMonth, listItemByCondition } = require('./js/api')
-const dayjs = require('dayjs')
+const { isBlank, validateAccountType, validateAccountCloseDate, isBalance } = require('./js/validate')
+const { initAccount, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, closeAccount,
+  addEntry, statsMonth, listItemByCondition } = require('./js/api')
+const { json } = require('express')
 
 // 初始化 account
 initAccount()
@@ -20,14 +21,19 @@ const ok = data => ({ code: 200, data })
 const badRequest = () => ({ code: 400 })
 const error = code => ({ code })
 
-// 模糊查询账户
-router.get('/account', function (req, res) {
+// 查询可用的账户
+router.get('/account/valid', function (req, res) {
   const key = req.query.key;
   if (isBlank(key)) {
-    res.json(ok(getAllAcount()))
+    res.json(ok(getAllValidAcount()))
   } else {
-    res.json(ok(getAccountLike(key)))
+    res.json(ok(getValidAccountLike(key)))
   }
+})
+
+// 模糊查询账户
+router.get('/account/all', function (req, res) {
+  res.json(ok(getAllAccounts()))
 })
 
 // 新增账户
@@ -38,6 +44,19 @@ router.post('/account', function (req, res) {
     res.json(badRequest())
   } else {
     res.json(ok(addAccount(account)))
+  }
+})
+
+// 新增账户
+router.post('/account/close', function (req, res) {
+  const { account, date } = req.query;
+  if (isBlank(account) || isBlank(date)) {
+    res.json(badRequest())
+  } else if (!validateAccountCloseDate(account, date)) {
+    // 结束时间不合法
+    return json(error(1002))
+  } else {
+    res.json(ok(closeAccount(account, date)))
   }
 })
 

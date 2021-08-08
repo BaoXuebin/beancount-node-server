@@ -1,3 +1,5 @@
+const accounts = require('../cache/accounts.json');
+
 const isBlank = str => {
   return !str || !(str.trim())
 }
@@ -29,8 +31,23 @@ const isBalance = (entries) => {
   return sum === 0
 }
 
+const validateAccountCloseDate = (account, date) => {
+  const accArr = accounts.filter(acc => acc.account === account)
+  if (accArr.length === 0) {
+    return false;
+  }
+  if (accArr[0].endDate) {
+    return false;
+  }
+  if (accArr[0].startDate > date) {
+    return false;
+  }
+  return true;
+}
+
 module.exports = {
   isBlank,
   isBalance,
-  validateAccountType
+  validateAccountType,
+  validateAccountCloseDate
 }
