@@ -49,25 +49,62 @@ const addEntry = (entry) => {
     fs.writeFileSync(monthBeanFile, '')
     fs.appendFileSync(`${config.dataPath}/index.bean`, `include "./month/${currentMonth}.bean"\r\n`)
   }
-  fs.appendFileSync(`${config.dataPath}/month/${dayjs().format("YYYY-MM")}.bean`, `${str}\r\n`)
+  fs.appendFileSync(`${config.dataPath}/month/${dayjs().format("YYYY-MM")}.bean`, `\r\n${str}\r\n`)
   return str;
 }
 
 const statsMonth = (year, month) => {
-  const bql = `SELECT root(account, 1), ABS(sum(position)) as total FROM year = ${year} and month = ${month} WHERE account ~ 'Income' OR account ~ 'Expenses' OR account ~ 'Liabilities' GROUP BY root(account, 1)`;
+  let bql = 'SELECT root(account, 1), ABS(sum(position)) as total WHERE account ~ \'Income\' OR account ~ \'Expenses\' OR account ~ \'Liabilities\' AND ';
+  if (year) {
+    bql += `year = ${year} AND `
+  }
+  if (month) {
+    bql += `month = ${month} AND `
+  }
+  bql = bql.replace(new RegExp(' AND $'), 'GROUP BY root(account, 1);');
   const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
-  let result = [];
-  let obj;
+  let obj = {};
   bqlResultSet.forEach(r => {
     const arr = r.trim().split(/\s+/)
     if (arr.length === 3) {
-      obj = {}
       obj[arr[0]] = arr[1]
-      result.push(obj)
     }
   });
-  return result;
+  return obj;
+}
+
+const listItemByCondition = ({ type, year, month }) => {
+  let bql = 'SELECT id, date, payee, narration, account, position';
+  if (type || year || month) {
+    bql += ' WHERE ';
+    if (type) {
+      bql += `account ~ '${type}' AND `
+    }
+    if (year) {
+      bql += `year = ${year} AND `
+    }
+    if (month) {
+      bql += `month = ${month} AND `
+    }
+    bql = bql.replace(new RegExp(' AND $'), ';');
+  }
+  console.log(bql)
+  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResultSet = bqlResult.split('\n').splice(2);
+  console.log(bqlResultSet)
+  return bqlResultSet.filter(r => r).map(r => {
+    const rArray = r.trim().split(/\s+/)
+    return {
+      id: rArray[0],
+      date: rArray[1],
+      payee: rArray[2],
+      desc: rArray[3],
+      account: rArray[4],
+      amount: rArray[5],
+      operatingCurrency: rArray[6]
+    }
+  })
 }
 
 module.exports = {
@@ -76,5 +113,6 @@ module.exports = {
   getAccountLike,
   addAccount,
   addEntry,
-  statsMonth
+  statsMonth,
+  listItemByCondition
 }

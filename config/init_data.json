@@ -31,8 +31,7 @@
     "Equity:Balance:账户中和"
   ],
   "liabilities": [
-    "Liabilities:Debt:花呗",
-    "Liabilities:Debt:信用卡",
-    "Liabilities:Claims:朋友欠款"
+    "Liabilities:CreditCard:花呗",
+    "Liabilities:CreditCard:信用卡"
   ]
 }

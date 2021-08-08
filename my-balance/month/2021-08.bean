@@ -1,12 +1,19 @@
-2021-08-05 * "祥和面馆" "鱼香肉丝凉面，加土豆丝"
-  Assets:EBank:支付宝 -19.00 CNY
-  Expenses:Food:午餐 19.00 CNY
-
 2021-08-07 * "祥和面馆" "鱼香肉丝面"
-  Assets:EBank:支付宝 -12.00 CNY
-  Expenses:Food:午餐 12.00 CNY
+  Assets:EBank:支付宝                                   -12.00 CNY
+  Expenses:Food:午餐                                    12.00 CNY
 
-2021-08-07 * "上海申通" "地铁重置200元"
+2021-08-07 * "上海申通" "地铁充值200元"
   Assets:EBank:支付宝 -200.00 CNY
   Expenses:Travel:公交地铁 200.00 CNY
 
+2021-08-01 * "投资收益" "七月份基金收益"
+  Income:Invest:投资收益 -1002.21 CNY
+  Assets:EBank:支付宝 1002.21 CNY
+
+2021-08-07 * "河南烩面" "羊肉烩面（大）"
+  Liabilities:Huabei:花呗 -16.00 CNY
+  Expenses:Food:晚餐 16.00 CNY
+
+2021-08-08 * "蜜雪冰城" "柠檬水"
+  Assets:EBank:支付宝 -3.00 CNY
+  Expenses:Shopping:零食水果 3.00 CNY

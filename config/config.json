@@ -1,5 +1,6 @@
 {
   "title": "我的账本",
   "dataPath": "./my-balance",
-  "operatingCurrency": "CNY"
+  "operatingCurrency": "CNY",
+  "startDate": "2021-08-01"
 }

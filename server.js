@@ -1,13 +1,13 @@
 const express = require('express')
 const { isBlank, validateAccountType, isBalance } = require('./js/validate')
-const { initAccount, getAccountLike, getAllAcount, addAccount, addEntry, statsMonth } = require('./js/api')
+const { initAccount, getAccountLike, getAllAcount, addAccount, addEntry, statsMonth, listItemByCondition } = require('./js/api')
 const dayjs = require('dayjs')
 
 // 初始化 account
 initAccount()
 
 const app = express()
-const port = 3000
+const port = 3001
 
 const router = express.Router();
 
@@ -44,7 +44,6 @@ router.post('/account', function (req, res) {
 // 记账
 router.post('/entry', function (req, res) {
   const entry = req.body;
-  console.log(entry)
   if (!entry || isBlank(entry.date) || isBlank(entry.desc) || !entry.entries) {
     res.json(badRequest())
   } else if (!isBalance(entry.entries)) {
@@ -55,10 +54,19 @@ router.post('/entry', function (req, res) {
   }
 })
 
+// 查询账单
+router.get('/entry', function (req, res) {
+  const { type, year, month } = req.query;
+  if (isBlank(type)) {
+    res.json(badRequest())
+  } else {
+    res.json(ok(listItemByCondition({ type, year, month })))
+  }
+})
+
 // 统计最近当前月的消费金额
-router.get('/month/stats', function(req, res) {
-  const year = req.query.year || dayjs().format('YYYY')
-  const month = req.query.month || dayjs().format('MM')
+router.get('/month/stats', function (req, res) {
+  const { year, month } = req.query;
   res.json(ok(statsMonth(year, month)))
 })
 

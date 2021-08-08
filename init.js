@@ -13,7 +13,7 @@ const dirs = [
   'cache',
 ]
 
-const getAccounts = (accountKeys) => accountKeys.map(accountKey => `${dayjs().format('YYYY-MM-DD')} open ${accountKey} ${config.operatingCurrency}`)
+const getAccounts = (accountKeys) => accountKeys.map(accountKey => `${config.startDate} open ${accountKey} ${config.operatingCurrency}`)
 const files = [
   [`${dataPath}/account/assets.bean`, getAccounts(initData.assets).join('\r\n')],
   [`${dataPath}/account/equity.bean`, getAccounts(initData.equity).join('\r\n')],
@@ -26,13 +26,11 @@ const files = [
 dirs.forEach(d => {
   if (!fs.existsSync(d)) {
     fs.mkdirSync(d)
-    console.log(`${d} created`)
   }
 })
 files.forEach(fArray => {
   if (!fs.existsSync(fArray[0])) {
     fs.writeFileSync(fArray[0], fArray[1])
-    console.log(`${fArray[0]} created`)
   }
 })
 
@@ -44,8 +42,8 @@ const indexLines = () => {
     `option "operating_currency" "${config.operatingCurrency}"`,
     'option "render_commas" "TRUE"',
     '',
-    '2021-01-01 custom "fava-option" "interval" "day"',
-    '2021-01-01 custom "fava-option" "language" "zh_CN"',
+    `${config.startDate} custom "fava-option" "interval" "day"`,
+    `${config.startDate} custom "fava-option" "language" "zh_CN"`,
     ''
   ];
   fs.readdirSync(`${dataPath}/account`).forEach(file => {
@@ -64,6 +62,7 @@ const indexLines = () => {
 ].forEach(fArray => {
   if (!fs.existsSync(fArray[0])) {
     fs.writeFileSync(fArray[0], fArray[1])
-    console.log(`${fArray[0]} created`)
   }
 })
+
+console.log("Success!")
