@@ -1,26 +1,19 @@
 const accounts = require('../cache/accounts.json');
+const { getAccountCata } = require('./utils');
 
 const isBlank = str => {
   return !str || !(str.trim())
 }
 
-const validateAccountType = (type) => {
-  if (isBlank(type)) {
-    return null;
+const validateAccount = (account) => {
+  if (account.split(':').length !== 3) {
+    return false
   }
-  type = type.toUpperCase();
-  if (type === 'ASSETS') {
-    return 'Assets'
-  } else if (type === 'INCOME') {
-    return 'Income'
-  } else if (type === 'EXPENSES') {
-    return 'Expenses'
-  } else if (type === 'LIABILITIES') {
-    return 'Liabilities'
-  } else if (type === 'EQUITY') {
-    return 'Equity'
+  const accountCata = getAccountCata(account)
+  if (!['Assets', 'Income', 'Expenses', 'Liabilities', 'Equity'].includes(accountCata)) {
+    return false
   }
-  return null;
+  return true;
 }
 
 const isBalance = (entries) => {
@@ -48,6 +41,6 @@ const validateAccountCloseDate = (account, date) => {
 module.exports = {
   isBlank,
   isBalance,
-  validateAccountType,
+  validateAccount,
   validateAccountCloseDate
 }

@@ -1,90 +1,7 @@
 const dayjs = require('dayjs');
 const fs = require('fs');
-const process = require('child_process')
-const iconv = require('iconv-lite');
-const accounts = require('../cache/accounts.json')
+const process = require('child_process');
 const config = require('../config/config.json');
-const { getAccountCata } = require('./utils');
-const accountCacheFilePath = './cache/accounts.json'
-
-const initAccount = () => {
-  const bqlResult = iconv.decode(process.execSync(`bean-report ${config.dataPath}/index.bean accounts`, { encoding: 'buffer' }), 'gbk')
-  const bqlResultSet = bqlResult.split('\n');
-  const accounts = bqlResultSet.map(r => {
-    const arr = r.trim().split(/\s+/)
-    if (arr.length === 2) {
-      return {
-        account: arr[0], startDate: arr[1]
-      }
-    }
-    if (arr.length === 3) {
-      return {
-        account: arr[0], startDate: arr[1], endDate: arr[2]
-      }
-    }
-    return null
-  }).filter(a => a)
-  fs.writeFileSync(accountCacheFilePath, JSON.stringify(accounts))
-}
-
-const getAllValidAcount = () => accounts.filter(acc => !acc.endDate).map(acc => acc.account)
-
-const getValidAccountLike = (key) => {
-  return accounts.filter(acc => !acc.endDate && acc.account.includes(key))
-}
-
-const getAllAccounts = () => {
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean balances`).toString()
-  const bqlResultSet = bqlResult.split('\n').splice(2);
-  const amountAccounts = bqlResultSet.map(r => {
-    const arr = r.trim().split(/\s+/)
-    if (arr.length === 3) {
-      return {
-        account: arr[0],
-        amount: arr[1],
-        operatingCurrency: arr[2]
-      }
-    }
-    return null;
-  }).filter(a => a);
-  const amountAccountKeys = amountAccounts.map(acc => acc.account);
-  return accounts.map(acc => {
-    if (amountAccountKeys.indexOf(acc.account) >= 0) {
-      const amountAccount = amountAccounts.filter(a => a.account === acc.account)[0]
-      return Object.assign(acc, amountAccount)
-    }
-    return acc
-  })
-}
-
-const addAccount = (account) => {
-  const { type, cata, date, value } = account
-  let str;
-  if (cata) {
-    str = `${date} open ${type}:${cata}:${value} ${config.operatingCurrency}`
-  } else {
-    str = `${date} open ${type}:${value} ${config.operatingCurrency}`
-  }
-  fs.appendFileSync(`${config.dataPath}/account/${type.toLowerCase()}.bean`, `${str}\r\n`)
-  return str
-}
-
-const closeAccount = (account, date) => {
-  const accountCata = getAccountCata(account)
-  const str = `${date} close ${account}`
-  fs.appendFileSync(`${config.dataPath}/account/${accountCata.toLowerCase()}.bean`, `\r\n${str}`)
-  // 刷新 account 缓存
-  accounts.forEach(acc => {
-    if (acc.account === account) {
-      acc.endDate = date
-    }
-  })
-  fs.writeFileSync(accountCacheFilePath, JSON.stringify(accounts))
-  return {
-    account,
-    endDate: date
-  }
-}
 
 const addEntry = (entry) => {
   const { date, payee, desc, entries } = entry
@@ -143,25 +60,32 @@ const listItemByCondition = ({ type, year, month }) => {
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.filter(r => r).map(r => {
     const rArray = r.trim().split(/\s+/)
-    return {
-      id: rArray[0],
-      date: rArray[1],
-      payee: rArray[2],
-      desc: rArray[3],
-      account: rArray[4],
-      amount: rArray[5],
-      operatingCurrency: rArray[6]
+    if (rArray.length === 7) {
+      return {
+        id: rArray[0],
+        date: rArray[1],
+        payee: rArray[2],
+        desc: rArray[3],
+        account: rArray[4],
+        amount: rArray[5],
+        operatingCurrency: rArray[6]
+      }
+    } else if (rArray.length === 6) {
+      return {
+        id: rArray[0],
+        date: rArray[1],
+        payee: '',
+        desc: rArray[2],
+        account: rArray[3],
+        amount: rArray[4],
+        operatingCurrency: rArray[5]
+      }
     }
-  }).reverse()
+    return null;
+  }).filter(a => a).reverse()
 }
 
 module.exports = {
-  initAccount,
-  getAllValidAcount,
-  getValidAccountLike,
-  getAllAccounts,
-  addAccount,
-  closeAccount,
   addEntry,
   statsMonth,
   listItemByCondition
