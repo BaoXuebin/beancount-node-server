@@ -5,18 +5,18 @@ const config = require('../config/config.json');
 
 const addEntry = (entry) => {
   const { date, payee, desc, entries } = entry
-  let str = `${date} * "${payee || ''}" "${desc}"\r\n`;
+  let str = `\r\n${date} * "${payee || ''}" "${desc}"`;
   entries.forEach(e => {
-    str += `  ${e.account} ${Number(e.amount).toFixed(2)} ${config.operatingCurrency}\r\n`
+    str += `\r\n  ${e.account} ${Number(e.amount).toFixed(2)} ${config.operatingCurrency}`
   })
   const currentMonth = dayjs().format("YYYY-MM");
   const monthBeanFile = `${config.dataPath}/month/${currentMonth}.bean`;
   // 月度账单不存在，则创建
   if (!fs.existsSync(monthBeanFile)) {
     fs.writeFileSync(monthBeanFile, '')
-    fs.appendFileSync(`${config.dataPath}/index.bean`, `include "./month/${currentMonth}.bean"\r\n`)
+    fs.appendFileSync(`${config.dataPath}/index.bean`, `\r\ninclude "./month/${currentMonth}.bean"`)
   }
-  fs.appendFileSync(`${config.dataPath}/month/${dayjs().format("YYYY-MM")}.bean`, `\r\n${str}\r\n`)
+  fs.appendFileSync(`${config.dataPath}/month/${dayjs().format("YYYY-MM")}.bean`, `\r\n${str}`)
   return str;
 }
 

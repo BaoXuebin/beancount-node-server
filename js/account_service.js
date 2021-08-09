@@ -3,6 +3,7 @@ const process = require('child_process')
 const iconv = require('iconv-lite');
 const accounts = require('../cache/accounts.json')
 const config = require('../config/config.json');
+const AccountTypes = require('../config/account_cata_list.json');
 const { getAccountCata } = require('./utils');
 const accountCacheFilePath = './cache/accounts.json'
 
@@ -86,11 +87,24 @@ const closeAccount = (account, date) => {
   }
 }
 
+const getAllAcountTypes = (cata) => {
+  let accountCata = AccountTypes
+  if (cata) {
+    return AccountTypes[cata] ? AccountTypes[cata].map(type => ({ key: `${cata}:${type.key}`, name: type.name })) : []
+  }
+  let result = []
+  Object.keys(accountCata).forEach(cata => {
+    result = result.concat(AccountTypes[cata].map(type => ({ key: `${cata}:${type.key}`, name: type.name })))
+  })
+  return result;
+}
+
 module.exports = {
   initAccount,
   getAllValidAcount,
   getValidAccountLike,
   getAllAccounts,
   addAccount,
-  closeAccount
+  closeAccount,
+  getAllAcountTypes
 }

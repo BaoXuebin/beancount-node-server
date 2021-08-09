@@ -1,84 +1,80 @@
 {
   "Assets": [
     {
-      "key": "EBank",
-      "name": "电子支付"
-    },
-    {
       "key": "Bank",
-      "name": "银行卡"
+      "name": "资产:银行卡"
     },
     {
       "key": "Cash",
-      "name": "现金"
+      "name": "资产:现金"
     },
     {
       "key": "Other",
-      "name": "其他"
+      "name": "资产:其他"
+    }
+  ],
+  "Liabilities": [
+    {
+      "key": "CreditCard",
+      "name": "负债:信用卡"
+    },
+    {
+      "key": "Friend",
+      "name": "负债:朋友"
+    },
+    {
+      "key": "Other",
+      "name": "负债:其他"
+    }
+  ],
+  "Income": [
+    {
+      "key": "Salary",
+      "name": "收入:薪资"
+    },
+    {
+      "key": "Invest",
+      "name": "收入:投资"
+    },
+    {
+      "key": "Exchange",
+      "name": "收入:转账"
+    },
+    {
+      "key": "Other",
+      "name": "收入:其他"
     }
   ],
   "Expenses": [
     {
       "key": "Food",
-      "name": "餐饮"
+      "name": "消费:餐饮"
     },
     {
       "key": "House",
-      "name": "住房"
+      "name": "消费:住房"
     },
     {
       "key": "Shopping",
-      "name": "购物"
+      "name": "消费:购物"
     },
     {
       "key": "Travel",
-      "name": "出行"
+      "name": "消费:出行"
     },
     {
       "key": "Subscribe",
-      "name": "订阅"
+      "name": "消费:订阅"
     },
     {
       "key": "Other",
-      "name": "其他"
+      "name": "消费:其他"
     }
   ],
   "Equity": [
     {
-      "key": "Balance",
-      "name": "账户"
-    },
-    {
       "key": "Other",
-      "name": "其他"
-    }
-  ],
-  "Liabilities": [
-    {
-      "key": "Debt",
-      "name": "债务"
-    },
-    {
-      "key": "Claims",
-      "name": "债权"
-    },
-    {
-      "key": "Other",
-      "name": "其他"
-    }
-  ],
-  "Income": [
-    {
-      "key": "Work",
-      "name": "工作"
-    },
-    {
-      "key": "Invest",
-      "name": "投资"
-    },
-    {
-      "key": "Other",
-      "name": "其他"
+      "name": "权益:其他"
     }
   ]
 }

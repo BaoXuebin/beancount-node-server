@@ -1,7 +1,8 @@
 {
   "assets": [
-    "Assets:EBank:支付宝",
-    "Assets:EBank:微信支付",
+    "Assets:Zhifubao:支付宝",
+    "Assets:WX:微信支付",
+    "Assets:Bank:农业银行",
     "Assets:Cash:现金"
   ],
   "expenses": [
@@ -20,15 +21,14 @@
     "Expenses:House:水煤气",
     "Expenses:Subscribe:手机话费",
     "Expenses:Subscribe:会员订阅",
-    "Expenses:Other:红包转账"
+    "Expenses:Exchange:红包转账"
   ],
   "income": [
     "Income:Work:工作收入",
-    "Income:Invest:投资收益",
-    "Income:Other:睡后收入"
+    "Income:Invest:投资收益"
   ],
   "equity": [
-    "Equity:Balance:账户中和"
+    "Equity:Opening-Balances:账户平衡"
   ],
   "liabilities": [
     "Liabilities:Huabei:花呗",

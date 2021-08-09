@@ -1,11 +1,8 @@
 const express = require('express')
 const { isBlank, validateAccount, validateAccountCloseDate, isBalance } = require('./js/validate')
-const { initAccount, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, closeAccount } = require('./js/account_service')
+const { initAccount, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, closeAccount, getAllAcountTypes } = require('./js/account_service')
 const { addEntry, statsMonth, listItemByCondition } = require('./js/api')
 const { json } = require('express')
-
-// 初始化 account
-initAccount()
 
 const app = express()
 const port = 3001
@@ -34,6 +31,12 @@ router.get('/account/valid', function (req, res) {
 router.get('/account/all', function (req, res) {
   res.json(ok(getAllAccounts()))
 })
+
+// 模糊查询账户
+router.get('/account/type', function (req, res) {
+  res.json(ok(getAllAcountTypes(req.query.cata)))
+})
+
 
 // 新增账户
 router.post('/account', function (req, res) {
@@ -104,5 +107,7 @@ router.get('/month/stats', function (req, res) {
 })
 
 app.listen(port, () => {
+  // 初始化 account
+  initAccount()
   console.log(`Example app listening at http://localhost:${port}`)
 })
