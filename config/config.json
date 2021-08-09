@@ -1,6 +1,6 @@
 {
   "title": "我的账本",
-  "dataPath": "./my-balance",
+  "dataPath": "/beancount",
   "operatingCurrency": "CNY",
   "startDate": "2021-08-01"
 }
