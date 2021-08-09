@@ -1,0 +1,38 @@
+{
+  "assets": [
+    "Assets:Zhifubao:支付宝",
+    "Assets:WX:微信支付",
+    "Assets:Bank:农业银行",
+    "Assets:Cash:现金"
+  ],
+  "expenses": [
+    "Expenses:Food:早餐",
+    "Expenses:Food:午餐",
+    "Expenses:Food:晚餐",
+    "Expenses:Travel:公交地铁",
+    "Expenses:Travel:出租车",
+    "Expenses:Travel:火车",
+    "Expenses:Travel:飞机",
+    "Expenses:Shopping:衣服鞋袜",
+    "Expenses:Shopping:购物",
+    "Expenses:Shopping:零食水果",
+    "Expenses:House:房租",
+    "Expenses:House:房贷",
+    "Expenses:House:水煤气",
+    "Expenses:Subscribe:手机话费",
+    "Expenses:Subscribe:会员订阅",
+    "Expenses:Exchange:红包转账"
+  ],
+  "income": [
+    "Income:Work:工作收入",
+    "Income:Invest:投资收益"
+  ],
+  "equity": [
+    "Equity:Opening-Balances:账户平衡"
+  ],
+  "liabilities": [
+    "Liabilities:Huabei:花呗",
+    "Liabilities:JD:京东白条",
+    "Liabilities:Bank:信用卡"
+  ]
+} 
