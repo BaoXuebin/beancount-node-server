@@ -3,6 +3,7 @@ const { isBlank, validateAccount, validateAccountCloseDate, isBalance } = requir
 const { initAccount, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, closeAccount, getAllAcountTypes } = require('./js/account_service')
 const { addEntry, statsMonth, listItemByCondition } = require('./js/api')
 const { json } = require('express')
+const init = require('./js/init')
 
 const app = express()
 const port = 3001
@@ -107,6 +108,7 @@ router.get('/month/stats', function (req, res) {
 })
 
 app.listen(port, () => {
+  init()
   // 初始化 account
   initAccount()
   console.log(`Example app listening at http://localhost:${port}`)
