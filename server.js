@@ -16,7 +16,6 @@ app.use(express.json())
 app.use(express.static('public'))
 app.use('/api', router);
 
-
 const ok = data => ({ code: 200, data })
 const badRequest = () => ({ code: 400 })
 const error = code => ({ code })

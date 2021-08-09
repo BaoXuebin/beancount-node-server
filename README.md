@@ -22,21 +22,10 @@
 
 ## 接口（已实现）
 
-1. 模糊查询账户
+1. `GET:/account?key=早餐` 查询可用账户
+2. `POST:/entry` 记录账单
     ```
-    GET:/account?key=早餐
-    result:
-    {
-        "code": 200,
-        "data": [
-            "Expenses:Food:早餐"
-        ]
-    }
-    ```
-2. 记录账单
-    ```
-    POST:/entry
-    json:
+    RequestBody:
     {
         "date": "2021-08-05",
         "store": "祥和面馆",
@@ -51,10 +40,5 @@
                 "amount": "19"
             }
         ]
-    }
-    result:
-    {
-      "code": 200,
-      "data": "2021-08-05 * \"祥和面馆\" \"鱼香肉丝凉面，加土豆丝\"\r\n  Assets:EBank:支付宝 -19.00 CNY\r\n  Expenses:Food:午餐 19.00 CNY\r\n"
     }
     ```
