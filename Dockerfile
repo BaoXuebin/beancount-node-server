@@ -2,7 +2,7 @@
 FROM node:12 AS build
 
 # install beancount
-RUN apt-get update || : && apt-get install python3.7 python3-pip -y
+RUN apt-get update || : && apt-get install python3.5 python3-pip -y
 RUN python -V
 RUN pip -V
 RUN pip install beancount -i https://pypi.tuna.tsinghua.edu.cn/simple
