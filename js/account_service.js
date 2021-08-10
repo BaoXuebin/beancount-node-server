@@ -1,36 +1,38 @@
 const fs = require('fs');
 const process = require('child_process')
-const iconv = require('iconv-lite');
-const accounts = require('../cache/accounts.json')
 const config = require('../config/config.json');
 const AccountTypes = require('../config/account_cata_list.json');
-const { getAccountCata } = require('./utils');
-const accountCacheFilePath = './cache/accounts.json'
+const Cache = require('./cache');
+const { getAccountCata, readFileByLines, lineToMap } = require('./utils');
 
 const initAccount = () => {
-  const bqlResult = process.execSync(`bean-report ${config.dataPath}/index.bean accounts`).toString()
-  const bqlResultSet = bqlResult.split('\n');
-  const accounts = bqlResultSet.map(r => {
-    const arr = r.trim().split(/\s+/)
-    if (arr.length === 2) {
-      return {
-        account: arr[0], startDate: arr[1]
+  const beanAccountFiles = fs.readdirSync(`${config.dataPath}/account`)
+  let dict = {}
+  beanAccountFiles.forEach(beanAccountFile => {
+    let fileAccounts = readFileByLines(`${config.dataPath}/account/${beanAccountFile}`).map(line => lineToMap(line))
+    fileAccounts.forEach(acc => {
+      if (dict[acc.account]) {
+        if (acc.type === 'open') {
+          dict[acc.account].startDate = acc.date
+        } else {
+          dict[acc.account].endDate = acc.date
+        }
+      } else {
+        if (acc.type === 'open') {
+          dict[acc.account] = { account: acc.account, startDate: acc.date }
+        } else {
+          dict[acc.account] = { account: acc.account, endDate: acc.date }
+        }
       }
-    }
-    if (arr.length === 3) {
-      return {
-        account: arr[0], startDate: arr[1], endDate: arr[2]
-      }
-    }
-    return null
-  }).filter(a => a)
-  fs.writeFileSync(accountCacheFilePath, JSON.stringify(accounts))
+    })
+  })
+  Cache.Accounts = Object.values(dict)
 }
 
-const getAllValidAcount = () => accounts.filter(acc => !acc.endDate).map(acc => acc.account)
+const getAllValidAcount = () => Cache.Accounts.filter(acc => !acc.endDate).map(acc => acc.account)
 
 const getValidAccountLike = (key) => {
-  return accounts.filter(acc => !acc.endDate && acc.account.includes(key))
+  return Cache.Accounts.filter(acc => !acc.endDate && acc.account.includes(key))
 }
 
 const getAllAccounts = () => {
@@ -48,7 +50,7 @@ const getAllAccounts = () => {
     return null;
   }).filter(a => a);
   const amountAccountKeys = amountAccounts.map(acc => acc.account);
-  return accounts.map(acc => {
+  return Cache.Accounts.map(acc => {
     if (amountAccountKeys.indexOf(acc.account) >= 0) {
       const amountAccount = amountAccounts.filter(a => a.account === acc.account)[0]
       return Object.assign(acc, amountAccount)

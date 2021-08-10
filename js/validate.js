@@ -1,5 +1,5 @@
-const accounts = require('../cache/accounts.json');
 const { getAccountCata } = require('./utils');
+const Cache = require('./cache');
 
 const isBlank = str => {
   return !str || !(str.trim())
@@ -25,7 +25,7 @@ const isBalance = (entries) => {
 }
 
 const validateAccountCloseDate = (account, date) => {
-  const accArr = accounts.filter(acc => acc.account === account)
+  const accArr = Cache.Accounts.filter(acc => acc.account === account)
   if (accArr.length === 0) {
     return false;
   }

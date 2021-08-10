@@ -9,7 +9,6 @@ const dirs = [
   dataPath,
   `${dataPath}/account`,
   `${dataPath}/month`,
-  'cache',
 ]
 
 const getAccounts = (accountKeys) => accountKeys.map(accountKey => `${config.startDate} open ${accountKey} ${config.operatingCurrency}`)
@@ -19,7 +18,6 @@ const files = [
   [`${dataPath}/account/expenses.bean`, getAccounts(initData.expenses).join('\r\n')],
   [`${dataPath}/account/income.bean`, getAccounts(initData.income).join('\r\n')],
   [`${dataPath}/account/liabilities.bean`, getAccounts(initData.liabilities).join('\r\n')],
-  ['cache/accounts.json', "[]"],
 ]
 
 // index.bean 初始化内容

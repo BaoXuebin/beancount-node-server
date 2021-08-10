@@ -24,7 +24,7 @@
     "Expenses:Exchange:红包转账"
   ],
   "income": [
-    "Income:Work:工作收入",
+    "Income:Salary:工作收入",
     "Income:Invest:投资收益"
   ],
   "equity": [
