@@ -64,8 +64,7 @@ const addAccount = (account, date) => {
   const str = `${date} open ${account} ${config.operatingCurrency}`
   fs.appendFileSync(`${config.dataPath}/account/${accountCata.toLowerCase()}.bean`, `\r\n${str}`)
   // 刷新 account 缓存
-  accounts.push({ account, startDate: date })
-  fs.writeFileSync(accountCacheFilePath, JSON.stringify(accounts))
+  Cache.Accounts.push({ account, startDate: date })
   return {
     account,
     startDate: date
@@ -82,7 +81,6 @@ const closeAccount = (account, date) => {
       acc.endDate = date
     }
   })
-  fs.writeFileSync(accountCacheFilePath, JSON.stringify(accounts))
   return {
     account,
     endDate: date
