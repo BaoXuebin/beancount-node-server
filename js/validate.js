@@ -1,5 +1,6 @@
 const { getAccountCata } = require('./utils');
 const Cache = require('./cache');
+const { Accounts } = require('./cache');
 
 const isBlank = str => {
   return !str || !(str.trim())
@@ -12,6 +13,10 @@ const validateAccount = (account) => {
   const accountCata = getAccountCata(account)
   if (!['Assets', 'Income', 'Expenses', 'Liabilities', 'Equity'].includes(accountCata)) {
     return false
+  }
+  const exist = Cache.Accounts.filter(acc => acc.account === account);
+  if (exist && exist.lenght > 0) {
+    return false;
   }
   return true;
 }
