@@ -1,7 +1,7 @@
 {
   "assets": [
     "Assets:Zhifubao:支付宝",
-    "Assets:WX:微信支付",
+    "Assets:WXPay:微信支付",
     "Assets:Bank:农业银行",
     "Assets:Cash:现金"
   ],

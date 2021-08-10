@@ -8,7 +8,7 @@ const { getAccountCata } = require('./utils');
 const accountCacheFilePath = './cache/accounts.json'
 
 const initAccount = () => {
-  const bqlResult = iconv.decode(process.execSync(`bean-report ${config.dataPath}/index.bean accounts`, { encoding: 'buffer' }), 'gbk')
+  const bqlResult = process.execSync(`bean-report ${config.dataPath}/index.bean accounts`).toString()
   const bqlResultSet = bqlResult.split('\n');
   const accounts = bqlResultSet.map(r => {
     const arr = r.trim().split(/\s+/)
