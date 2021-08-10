@@ -4,7 +4,7 @@
 
 ## 介绍
 
-`beancount` 是一个优秀的开源复式记账工具，因为其基于文本记录的特性，难以拓展到移动端；本项目旨在将常见的记账行为提取出接口以供网络调用。
+[beancount](https://github.com/beancount/) 是一个优秀的开源复式记账工具，因为其基于文本记录的特性，难以拓展到移动端；本项目旨在将常见的记账行为提取出接口以供网络调用。
 
 本仓库使用 `node` 进行文本的读写和网络服务支持。
 
@@ -15,6 +15,7 @@
 **title**: 账本名称  
 **dataPath**: 账本存储位置，初始化账本时使用  
 **operatingCurrency**: 账本币种
+**startDate**: 账本创建时间，初始化账本时使用
 
 ## 使用
 
@@ -23,32 +24,40 @@
 2. 切换到项目根目录，在命令行执行 `node init.js`，该命令会生成基本的 beancount 账单结构和账户，你可以在 `config/init_data.json` 中查看初始内容
 3. 执行 `node server.js` 启动服务
 
-## 接口（已实现）
+> 本项目中将 ***账户*** 默认设置为三级结构：Assets|Incom|Libilities|Expenses|Equity:Type:Name（可使用中文）  
+> Type 在 *config/account_cata_list.json* 中定义，如需添加，可以修改该文件
 
-1. `GET:/account/valid?key=早餐` 查询可用账户
-2. `GET:/account/all` 查询所有账户(包括账户金额)
-3. `POST:/account?account&date` 新增账户
-4. `POST:/account/close?account&date` 关闭账户
-5. `GET:/month/stats?year&month` 月度统计信息
-6. `POST:/entry` 记录账单
-    ```
-    RequestBody:
-    {
-        "date": "2021-08-05",
-        "store": "祥和面馆",
-        "desc": "鱼香肉丝凉面，加土豆丝",
-        "entries": [
+## 可用接口（V1.0 计划开发接口）
+
+1. [X] `GET:/account/valid?key=早餐` 查询可用账户
+2. [X] `GET:/account/all` 查询所有账户(包括账户金额)
+3. [X] `POST:/account?account&date` 新增账户
+4. [X] `POST:/account/close?account&date` 关闭账户
+5. [X] `GET:/month/stats?year&month` 月度统计信息
+6. [X] `GET:/entry?type&year&month` 查询账单
+7. [X] `POST:/entry` 记录账单
+    ```js
+    // 请求参数
+    const requestbody = {
+        date: "2021-08-05",
+        store: "祥和面馆",
+        desc: "鱼香肉丝凉面，加土豆丝",
+        entries: [
             {
-                "account": "Assets:EBank:支付宝",
-                "amount": "-19"
+                account: "Assets:EBank:支付宝",
+                amount: "-19"
             },
             {
-                "account": "Expenses:Food:午餐",
-                "amount": "19"
+                account: "Expenses:Food:午餐",
+                amount: "19"
             }
         ]
     }
     ```
+8. [] `GET:/stats` 账单统计
+9. [] `POST:/account/recover?account` 账户恢复
+10. [] `PUT:/entry` 账目修改
+11. [] `DELETE:/entry?id=` 账目删除
 
 ## Docker 部署
 

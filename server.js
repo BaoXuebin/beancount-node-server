@@ -66,17 +66,17 @@ router.post('/account/close', function (req, res) {
 })
 
 // 恢复账户
-router.post('/account/recover', function (req, res) {
-  const { account, date } = req.query;
-  if (!validateAccount(account)) {
-    // 账户不存在
-    res.json(error(1004))
-  } else if (isBlank(account) || isBlank(date)) {
-    res.json(badRequest())
-  } else {
-    res.json(ok(addAccount(account, date)))
-  }
-})
+// router.post('/account/recover', function (req, res) {
+//   const { account, date } = req.query;
+//   if (!validateAccount(account)) {
+//     // 账户不存在
+//     res.json(error(1004))
+//   } else if (isBlank(account) || isBlank(date)) {
+//     res.json(badRequest())
+//   } else {
+//     res.json(ok(addAccount(account, date)))
+//   }
+// })
 
 // 记账
 router.post('/entry', function (req, res) {
