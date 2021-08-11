@@ -31,11 +31,10 @@
 
 1. [X] `GET:/account/valid?key=早餐` 查询可用账户
 2. [X] `GET:/account/all` 查询可用账户(包括账户金额)
-3. [X] `POST:/account?account&date` 新增账户
+3. [X] `POST:/account?account&date` 新增账户（账户已存在则恢复）
 4. [X] `POST:/account/close?account&date` 关闭账户
-5. [X] `GET:/month/stats?year&month` 月度统计信息
-6. [X] `GET:/entry?type&year&month` 查询账单
-7. [X] `POST:/entry` 记录账单
+5. [X] `GET:/entry?type&year&month` 查询账单
+6. [X] `POST:/entry` 记账
     ```js
     // 请求参数
     const requestbody = {
@@ -54,9 +53,9 @@
         ]
     }
     ```
-8. [-] `GET:/stats` 账单统计
-9.  [-] `PUT:/entry` 账目修改
-10. [-] `DELETE:/entry?id=` 账目删除
+7. [X] `GET:/stats/total?year&month` 统计账目类型金额（资产，收入，消费，债务）
+8.  [-] `PUT:/entry` 账目修改
+9.  [-] `DELETE:/entry?id=` 账目删除
 
 ## Docker 部署
 
