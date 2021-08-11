@@ -1,7 +1,8 @@
 const express = require('express')
 const { isBlank, validateAccount, validateAccountCloseDate, isBalance } = require('./js/validate')
 const { initAccount, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, closeAccount, getAllAcountTypes } = require('./js/account_service')
-const { addEntry, statsMonth, listItemByCondition } = require('./js/api')
+const { addEntry, listItemByCondition, execCmd } = require('./js/api')
+const { statsTotalAmount } = require('./js/stats')
 const { json } = require('express')
 const init = require('./js/init')
 
@@ -93,10 +94,23 @@ router.get('/entry', function (req, res) {
   }
 })
 
-// 统计最近当前月的消费金额
-router.get('/month/stats', function (req, res) {
+// 统计总资产
+router.get('/stats/total', function (req, res) {
   const { year, month } = req.query;
-  res.json(ok(statsMonth(year, month)))
+  res.json(ok(statsTotalAmount(year, month)))
+})
+
+// 统计最近当前月的消费金额
+router.get('/stats/exec', function (req, res) {
+  const { cmd } = req.query;
+  if (isBlank(cmd)) {
+    res.json(badRequest())
+  } else if (['bean-query', 'bean-report'].indexOf(cmd.split(/\s+/)[0])) {
+    // 无效的命令
+    res.json(error(1005))
+  } else {
+    res.json(ok(execCmd(cmd)))
+  }
 })
 
 app.listen(port, () => {

@@ -20,26 +20,7 @@ const addEntry = (entry) => {
   return str;
 }
 
-const statsMonth = (year, month) => {
-  let bql = 'SELECT root(account, 1), ABS(sum(position)) as total WHERE account ~ \'Income\' OR account ~ \'Expenses\' OR account ~ \'Liabilities\' AND ';
-  if (year) {
-    bql += `year = ${year} AND `
-  }
-  if (month) {
-    bql += `month = ${month} AND `
-  }
-  bql = bql.replace(new RegExp(' AND $'), 'GROUP BY root(account, 1);');
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
-  const bqlResultSet = bqlResult.split('\n').splice(2);
-  let obj = {};
-  bqlResultSet.forEach(r => {
-    const arr = r.trim().split(/\s+/)
-    if (arr.length === 3) {
-      obj[arr[0]] = arr[1]
-    }
-  });
-  return obj;
-}
+
 
 const listItemByCondition = ({ type, year, month }) => {
   let bql = 'SELECT id, date, payee, narration, account, position';
@@ -85,8 +66,10 @@ const listItemByCondition = ({ type, year, month }) => {
   }).filter(a => a).reverse()
 }
 
+const execCmd = cmd => process.execSync(cmd).toString()
+
 module.exports = {
   addEntry,
-  statsMonth,
-  listItemByCondition
+  listItemByCondition,
+  execCmd
 }
