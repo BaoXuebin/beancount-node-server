@@ -63,16 +63,14 @@ const getAllAccounts = () => {
 const addAccount = (account, date) => {
   const existAccount = Cache.Accounts.filter(acc => acc.account === account)[0]
   if (existAccount) { // 之前存在该账户
-    existAccount.startDate = date;
+    date = existAccount.startDate
     delete existAccount.endDate;
-    //
-    commentAccount(account)
+    commentAccount(account, ' close ')
   } else {
     Cache.Accounts.push({ account, startDate: date })
+    const str = `${date} open ${account} ${config.operatingCurrency}`
+    fs.appendFileSync(`${config.dataPath}/account/${getAccountCata(account).toLowerCase()}.bean`, `\r\n${str}`)
   }
-
-  const str = `${date} open ${account} ${config.operatingCurrency}`
-  fs.appendFileSync(`${config.dataPath}/account/${getAccountCata(account).toLowerCase()}.bean`, `\r\n${str}`)
 
   return {
     account,
