@@ -1,4 +1,6 @@
 const fs = require('fs');
+const AccountTypes = require('../config/account_cata_list.json');
+const config = require('../config/config.json');
 
 // 忽略注释行
 const isCommnetLine = line => line.startsWith('* ');
@@ -41,10 +43,40 @@ const getAccountName = account => {
   return ''
 }
 
+const getAccountTypeDict = account => {
+  const cataTypes = AccountTypes[getAccountCata(account)]
+  if (cataTypes) {
+    const arr = cataTypes.filter(ct => ct.key === getAccountType(account))
+    if (arr.length > 0) {
+      return arr[0]
+    }
+  }
+  const accType = getAccountType(account)
+  return { key: accType, value: accType }
+}
+
+const commentAccount = (account, keyword) => {
+  const beanfilePath = `${config.dataPath}/account/${getAccountCata(account).toLowerCase()}.bean`;
+  const accountLines = fs.readFileSync(beanfilePath, 'utf8').split('\r\n');
+
+  const content = accountLines.map(line => {
+    if (line.indexOf(account) >= 0) {
+      if (keyword) {
+        return line.indexOf(keyword) >= 0 ? ('; ' + line) : line;
+      }
+      return '; ' + line;
+    }
+    return line;
+  }).join('\r\n')
+  fs.writeFileSync(beanfilePath, content, 'utf8');
+}
+
 module.exports = {
   readFileByLines,
   lineToMap,
   getAccountCata,
   getAccountType,
-  getAccountName
+  getAccountTypeDict,
+  getAccountName,
+  commentAccount
 }

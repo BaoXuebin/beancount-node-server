@@ -3,7 +3,7 @@ const process = require('child_process')
 const config = require('../config/config.json');
 const AccountTypes = require('../config/account_cata_list.json');
 const Cache = require('./cache');
-const { getAccountCata, readFileByLines, lineToMap } = require('./utils');
+const { getAccountCata, readFileByLines, lineToMap, getAccountType, getAccountTypeDict, commentAccount } = require('./utils');
 
 const initAccount = () => {
   const beanAccountFiles = fs.readdirSync(`${config.dataPath}/account`)
@@ -50,7 +50,8 @@ const getAllAccounts = () => {
     return null;
   }).filter(a => a);
   const amountAccountKeys = amountAccounts.map(acc => acc.account);
-  return Cache.Accounts.map(acc => {
+  return Cache.Accounts.filter(acc => !acc.endDate).map(acc => {
+    acc.type = getAccountTypeDict(acc.account)
     if (amountAccountKeys.indexOf(acc.account) >= 0) {
       const amountAccount = amountAccounts.filter(a => a.account === acc.account)[0]
       return Object.assign(acc, amountAccount)
@@ -60,14 +61,23 @@ const getAllAccounts = () => {
 }
 
 const addAccount = (account, date) => {
-  const accountCata = getAccountCata(account)
+  const existAccount = Cache.Accounts.filter(acc => acc.account === account)[0]
+  if (existAccount) { // 之前存在该账户
+    existAccount.startDate = date;
+    delete existAccount.endDate;
+    //
+    commentAccount(account)
+  } else {
+    Cache.Accounts.push({ account, startDate: date })
+  }
+
   const str = `${date} open ${account} ${config.operatingCurrency}`
-  fs.appendFileSync(`${config.dataPath}/account/${accountCata.toLowerCase()}.bean`, `\r\n${str}`)
-  // 刷新 account 缓存
-  Cache.Accounts.push({ account, startDate: date })
+  fs.appendFileSync(`${config.dataPath}/account/${getAccountCata(account).toLowerCase()}.bean`, `\r\n${str}`)
+
   return {
     account,
-    startDate: date
+    startDate: date,
+    type: getAccountTypeDict(account)
   }
 }
 
@@ -76,7 +86,7 @@ const closeAccount = (account, date) => {
   const str = `${date} close ${account}`
   fs.appendFileSync(`${config.dataPath}/account/${accountCata.toLowerCase()}.bean`, `\r\n${str}`)
   // 刷新 account 缓存
-  accounts.forEach(acc => {
+  Cache.Accounts.forEach(acc => {
     if (acc.account === account) {
       acc.endDate = date
     }

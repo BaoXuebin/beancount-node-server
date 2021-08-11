@@ -18,6 +18,11 @@ const ok = data => ({ code: 200, data })
 const badRequest = () => ({ code: 400 })
 const error = code => ({ code })
 
+router.get('/account/init', function (req, res) {
+  initAccount();
+  res.json(ok())
+})
+
 // 查询可用的账户
 router.get('/account/valid', function (req, res) {
   const key = req.query.key;
@@ -64,19 +69,6 @@ router.post('/account/close', function (req, res) {
     res.json(ok(closeAccount(account, date)))
   }
 })
-
-// 恢复账户
-// router.post('/account/recover', function (req, res) {
-//   const { account, date } = req.query;
-//   if (!validateAccount(account)) {
-//     // 账户不存在
-//     res.json(error(1004))
-//   } else if (isBlank(account) || isBlank(date)) {
-//     res.json(badRequest())
-//   } else {
-//     res.json(ok(addAccount(account, date)))
-//   }
-// })
 
 // 记账
 router.post('/entry', function (req, res) {

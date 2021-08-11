@@ -30,7 +30,7 @@
 ## 可用接口（V1.0 计划开发接口）
 
 1. [X] `GET:/account/valid?key=早餐` 查询可用账户
-2. [X] `GET:/account/all` 查询所有账户(包括账户金额)
+2. [X] `GET:/account/all` 查询可用账户(包括账户金额)
 3. [X] `POST:/account?account&date` 新增账户
 4. [X] `POST:/account/close?account&date` 关闭账户
 5. [X] `GET:/month/stats?year&month` 月度统计信息
@@ -54,10 +54,9 @@
         ]
     }
     ```
-8. [] `GET:/stats` 账单统计
-9. [] `POST:/account/recover?account` 账户恢复
-10. [] `PUT:/entry` 账目修改
-11. [] `DELETE:/entry?id=` 账目删除
+8. [-] `GET:/stats` 账单统计
+9.  [-] `PUT:/entry` 账目修改
+10. [-] `DELETE:/entry?id=` 账目删除
 
 ## Docker 部署
 

@@ -1,80 +1,108 @@
 {
   "Assets": [
     {
+      "key": "Zhifubao",
+      "name": "支付宝"
+    },
+    {
+      "key": "WXPay",
+      "name": "微信支付"
+    },
+    {
       "key": "Bank",
-      "name": "资产:银行卡"
+      "name": "银行卡"
     },
     {
       "key": "Cash",
-      "name": "资产:现金"
+      "name": "现金"
     },
     {
       "key": "Other",
-      "name": "资产:其他"
+      "name": "其他"
     }
   ],
   "Liabilities": [
     {
       "key": "CreditCard",
-      "name": "负债:信用卡"
+      "name": "信用卡"
+    },
+    {
+      "key": "Huabei",
+      "name": "花呗"
+    },
+    {
+      "key": "JD",
+      "name": "京东白条"
     },
     {
       "key": "Friend",
-      "name": "负债:朋友"
+      "name": "朋友"
     },
     {
       "key": "Other",
-      "name": "负债:其他"
+      "name": "其他"
     }
   ],
   "Income": [
     {
       "key": "Salary",
-      "name": "收入:薪资"
+      "name": "薪资"
     },
     {
       "key": "Invest",
-      "name": "收入:投资"
+      "name": "投资"
     },
     {
       "key": "Exchange",
-      "name": "收入:转账"
+      "name": "转账"
     },
     {
       "key": "Other",
-      "name": "收入:其他"
+      "name": "其他"
     }
   ],
   "Expenses": [
     {
       "key": "Food",
-      "name": "消费:餐饮"
+      "name": "餐饮"
     },
     {
       "key": "House",
-      "name": "消费:住房"
+      "name": "住房"
     },
     {
       "key": "Shopping",
-      "name": "消费:购物"
+      "name": "购物"
+    },
+    {
+      "key": "Hobby",
+      "name": "爱好"
     },
     {
       "key": "Travel",
-      "name": "消费:出行"
+      "name": "出行"
     },
     {
       "key": "Subscribe",
-      "name": "消费:订阅"
+      "name": "订阅"
+    },
+    {
+      "key": "Exchange",
+      "name": "转账"
     },
     {
       "key": "Other",
-      "name": "消费:其他"
+      "name": "其他"
     }
   ],
   "Equity": [
     {
+      "key": "Opening-Balances",
+      "name": "账户平衡"
+    },
+    {
       "key": "Other",
-      "name": "权益:其他"
+      "name": "其他"
     }
   ]
 } 
