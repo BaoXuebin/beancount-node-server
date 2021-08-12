@@ -15,6 +15,7 @@ const init = (ledgerId, title, operatingCurrency, startDate) => {
 
   // 初始化必须的文件结构
   const dirs = [
+    config.dataPath,
     dataPath,
     `${dataPath}/account`,
     `${dataPath}/month`,

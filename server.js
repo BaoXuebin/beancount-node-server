@@ -37,7 +37,7 @@ router.get('/ledger', function (req, res) {
 })
 
 router.post('/ledger', function (req, res) {
-  const { mail, secret } = req.body
+  const { mail } = req.body
   if (isBlank(mail)) {
     res.json(badRequest())
   } else {
