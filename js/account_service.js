@@ -3,7 +3,7 @@ const process = require('child_process')
 const config = require('../config/config.json');
 const AccountTypes = require('../config/account_cata_list.json');
 const Cache = require('./cache');
-const { getAccountCata, readFileByLines, lineToMap, getAccountType, getAccountTypeDict, commentAccount } = require('./utils');
+const { getAccountCata, readFileByLines, lineToMap, getAccountTypeDict, commentAccount } = require('./utils');
 
 const initAccount = () => {
   const beanAccountFiles = fs.readdirSync(`${config.dataPath}/account`)
@@ -29,7 +29,7 @@ const initAccount = () => {
   Cache.Accounts = Object.values(dict)
 }
 
-const getAllValidAcount = () => Cache.Accounts.filter(acc => !acc.endDate).map(acc => acc.account)
+const getAllValidAcount = () => Cache.Accounts.filter(acc => !acc.endDate).map(acc => acc.account).sort()
 
 const getValidAccountLike = (key) => {
   return Cache.Accounts.filter(acc => !acc.endDate && acc.account.includes(key))

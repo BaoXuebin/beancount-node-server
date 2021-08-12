@@ -1,13 +1,12 @@
 const { getAccountCata } = require('./utils');
 const Cache = require('./cache');
-const { Accounts } = require('./cache');
 
 const isBlank = str => {
   return !str || !(str.trim())
 }
 
 const validateAccount = (account) => {
-  if (account.split(':').length !== 3) {
+  if (account.split(':').length < 3) {
     return false
   }
   const accountCata = getAccountCata(account)
