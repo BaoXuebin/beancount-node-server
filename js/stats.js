@@ -9,7 +9,6 @@ const statsTotalAmount = (year, month) => {
   if (month) {
     bql += `AND month = ${month}`
   }
-  console.log(bql)
   const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   let obj = {};

@@ -49,6 +49,10 @@
       "name": "薪资"
     },
     {
+      "key": "GOV",
+      "name": "社会收入"
+    },
+    {
       "key": "Invest",
       "name": "投资"
     },
@@ -93,6 +97,10 @@
     {
       "key": "Insurance",
       "name": "保险"
+    },
+    {
+      "key": "Gov",
+      "name": "社会支出"
     },
     {
       "key": "Other",
