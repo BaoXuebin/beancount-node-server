@@ -1,7 +1,6 @@
 const process = require('child_process');
-const config = require('../config/config.json');
 
-const statsTotalAmount = (year, month) => {
+const statsTotalAmount = (config, year, month) => {
   let bql = 'SELECT root(account, 1), sum(position)';
   if (year) {
     bql += `FROM year = ${year}`

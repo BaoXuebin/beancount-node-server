@@ -1,11 +1,16 @@
 const fs = require('fs');
 const process = require('child_process')
-const config = require('../config/config.json');
 const AccountTypes = require('../config/account_cata_list.json');
 const Cache = require('./cache');
 const { getAccountCata, readFileByLines, lineToMap, getAccountTypeDict, commentAccount } = require('./utils');
 
-const initAccount = () => {
+const initAllLedgerAccountCache = () => {
+  Object.values(Cache.LedgerConfig).forEach(config => {
+    initAccountCache(config)
+  })
+}
+
+const initAccountCache = (config) => {
   const beanAccountFiles = fs.readdirSync(`${config.dataPath}/account`)
   let dict = {}
   beanAccountFiles.forEach(beanAccountFile => {
@@ -26,16 +31,18 @@ const initAccount = () => {
       }
     })
   })
-  Cache.Accounts = Object.values(dict)
+  Cache.Accounts[config.id] = Object.values(dict)
 }
 
-const getAllValidAcount = () => Cache.Accounts.filter(acc => !acc.endDate).map(acc => acc.account).sort()
-
-const getValidAccountLike = (key) => {
-  return Cache.Accounts.filter(acc => !acc.endDate && acc.account.includes(key))
+const getAllValidAcount = (config) => {
+  return Cache.Accounts[config.id].filter(acc => !acc.endDate).map(acc => acc.account).sort()
 }
 
-const getAllAccounts = () => {
+const getValidAccountLike = (config, key) => {
+  return Cache.Accounts[config.id].filter(acc => !acc.endDate && acc.account.includes(key))
+}
+
+const getAllAccounts = (config) => {
   const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean balances`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   const amountAccounts = bqlResultSet.map(r => {
@@ -50,7 +57,7 @@ const getAllAccounts = () => {
     return null;
   }).filter(a => a);
   const amountAccountKeys = amountAccounts.map(acc => acc.account);
-  return Cache.Accounts.filter(acc => !acc.endDate).map(acc => {
+  return Cache.Accounts[config.id].filter(acc => !acc.endDate).map(acc => {
     acc.type = getAccountTypeDict(acc.account)
     if (amountAccountKeys.indexOf(acc.account) >= 0) {
       const amountAccount = amountAccounts.filter(a => a.account === acc.account)[0]
@@ -60,14 +67,14 @@ const getAllAccounts = () => {
   })
 }
 
-const addAccount = (account, date) => {
-  const existAccount = Cache.Accounts.filter(acc => acc.account === account)[0]
+const addAccount = (config, account, date) => {
+  const existAccount = Cache.Accounts[config.id].filter(acc => acc.account === account)[0]
   if (existAccount) { // 之前存在该账户
     date = existAccount.startDate
     delete existAccount.endDate;
     commentAccount(account, ' close ')
   } else {
-    Cache.Accounts.push({ account, startDate: date })
+    Cache.Accounts[config.id].push({ account, startDate: date })
     const str = `${date} open ${account} ${config.operatingCurrency}`
     fs.appendFileSync(`${config.dataPath}/account/${getAccountCata(account).toLowerCase()}.bean`, `\r\n${str}`)
   }
@@ -79,12 +86,12 @@ const addAccount = (account, date) => {
   }
 }
 
-const closeAccount = (account, date) => {
+const closeAccount = (config, account, date) => {
   const accountCata = getAccountCata(account)
   const str = `${date} close ${account}`
   fs.appendFileSync(`${config.dataPath}/account/${accountCata.toLowerCase()}.bean`, `\r\n${str}`)
   // 刷新 account 缓存
-  Cache.Accounts.forEach(acc => {
+  Cache.Accounts[config.id].forEach(acc => {
     if (acc.account === account) {
       acc.endDate = date
     }
@@ -108,7 +115,8 @@ const getAllAcountTypes = (cata) => {
 }
 
 module.exports = {
-  initAccount,
+  initAccountCache,
+  initAllLedgerAccountCache,
   getAllValidAcount,
   getValidAccountLike,
   getAllAccounts,

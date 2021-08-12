@@ -3,6 +3,7 @@
     "Assets:Zhifubao:支付宝",
     "Assets:WXPay:微信支付",
     "Assets:Bank:农业银行",
+    "Assets:Bank:住房公积金",
     "Assets:Cash:现金"
   ],
   "expenses": [
@@ -21,11 +22,17 @@
     "Expenses:House:水煤气",
     "Expenses:Subscribe:手机话费",
     "Expenses:Subscribe:会员订阅",
-    "Expenses:Exchange:红包转账"
+    "Expenses:Exchange:红包转账",
+    "Expenses:Insurance:养老保险",
+    "Expenses:Insurance:医疗保险",
+    "Expenses:Insurance:失业保险",
+    "Expenses:Gov:个人所得税"
   ],
   "income": [
     "Income:Salary:工作收入",
-    "Income:Invest:投资收益"
+    "Income:Invest:投资收益",
+    "Income:Gov:财政退税",
+    "Income:Gov:单位缴纳公积金"
   ],
   "equity": [
     "Equity:Opening-Balances:账户平衡"

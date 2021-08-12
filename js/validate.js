@@ -5,7 +5,7 @@ const isBlank = str => {
   return !str || !(str.trim())
 }
 
-const validateAccount = (account) => {
+const validateAccount = (config, account) => {
   if (account.split(':').length < 3) {
     return false
   }
@@ -13,7 +13,7 @@ const validateAccount = (account) => {
   if (!['Assets', 'Income', 'Expenses', 'Liabilities', 'Equity'].includes(accountCata)) {
     return false
   }
-  const exist = Cache.Accounts.filter(acc => acc.account === account);
+  const exist = Cache.Accounts[config.id].filter(acc => acc.account === account);
   if (exist && exist.lenght > 0) {
     return false;
   }
@@ -28,8 +28,8 @@ const isBalance = (entries) => {
   return sum === 0
 }
 
-const validateAccountCloseDate = (account, date) => {
-  const accArr = Cache.Accounts.filter(acc => acc.account === account)
+const validateAccountCloseDate = (config, account, date) => {
+  const accArr = Cache.Accounts[config.id].filter(acc => acc.account === account)
   if (accArr.length === 0) {
     return false;
   }

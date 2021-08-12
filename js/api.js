@@ -1,9 +1,8 @@
 const dayjs = require('dayjs');
 const fs = require('fs');
 const process = require('child_process');
-const config = require('../config/config.json');
 
-const addEntry = (entry) => {
+const addEntry = (config, entry) => {
   const { date, payee, desc, entries } = entry
   let str = `\r\n${date} * "${payee || ''}" "${desc}"`;
   entries.forEach(e => {
@@ -20,9 +19,7 @@ const addEntry = (entry) => {
   return str;
 }
 
-
-
-const listItemByCondition = ({ type, year, month }) => {
+const listItemByCondition = (config, { type, year, month }) => {
   let bql = 'SELECT id, date, payee, narration, account, position';
   if (type || year || month) {
     bql += ' WHERE ';
