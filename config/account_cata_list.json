@@ -91,6 +91,10 @@
       "name": "转账"
     },
     {
+      "key": "Insurance",
+      "name": "保险"
+    },
+    {
       "key": "Other",
       "name": "其他"
     }

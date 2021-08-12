@@ -38,7 +38,7 @@ const getAccountType = account => {
 const getAccountName = account => {
   const array = account.split(':')
   if (array && array.length >= 3) {
-    return account.split(':')[2]
+    return account.split(':')[array.length - 1]
   }
   return ''
 }
