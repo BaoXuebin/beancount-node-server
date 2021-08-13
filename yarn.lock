@@ -54,6 +54,10 @@ cookie@0.4.0:
   version "0.4.0"
   resolved "https://repo.huaweicloud.com/repository/npm/cookie/-/cookie-0.4.0.tgz#beb437e7022b3b6d49019d088665303ebe9c14ba"
 
+crypto@^1.0.1:
+  version "1.0.1"
+  resolved "https://repo.huaweicloud.com/repository/npm/crypto/-/crypto-1.0.1.tgz#2af1b7cad8175d24c8a1b0778255794a21803037"
+
 dayjs@^1.10.6:
   version "1.10.6"
   resolved "https://repo.huaweicloud.com/repository/npm/dayjs/-/dayjs-1.10.6.tgz#288b2aa82f2d8418a6c9d4df5898c0737ad02a63"

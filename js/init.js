@@ -1,47 +1,57 @@
 const fs = require('fs');
 const config = require('../config/config.json')
-const initData = require('../config/init_data.json')
+const initData = require('../config/init_data.json');
+const Cache = require('./cache');
 
-const dataPath = config.dataPath;
+const init = (ledgerId, title, operatingCurrency, startDate) => {
+  let dataPath = config.dataPath
+  if (ledgerId) {
+    dataPath = `${config.dataPath}/${ledgerId}`
+  }
 
-// 初始化必须的文件结构
-const dirs = [
-  dataPath,
-  `${dataPath}/account`,
-  `${dataPath}/month`,
-]
+  title = title || config.title
+  operatingCurrency = operatingCurrency || config.operatingCurrency
+  startDate = startDate || config.startDate
 
-const getAccounts = (accountKeys) => accountKeys.map(accountKey => `${config.startDate} open ${accountKey} ${config.operatingCurrency}`)
-const files = [
-  [`${dataPath}/account/assets.bean`, getAccounts(initData.assets).join('\r\n')],
-  [`${dataPath}/account/equity.bean`, getAccounts(initData.equity).join('\r\n')],
-  [`${dataPath}/account/expenses.bean`, getAccounts(initData.expenses).join('\r\n')],
-  [`${dataPath}/account/income.bean`, getAccounts(initData.income).join('\r\n')],
-  [`${dataPath}/account/liabilities.bean`, getAccounts(initData.liabilities).join('\r\n')],
-]
+  // 初始化必须的文件结构
+  const dirs = [
+    config.dataPath,
+    dataPath,
+    `${dataPath}/account`,
+    `${dataPath}/month`,
+  ]
 
-// index.bean 初始化内容
-const indexLines = () => {
-  let lines = [
-    `option "title" "${config.title}"`,
-    `option "operating_currency" "${config.operatingCurrency}"`,
-    'option "render_commas" "TRUE"',
-    '',
-    `${config.startDate} custom "fava-option" "interval" "day"`,
-    `${config.startDate} custom "fava-option" "language" "zh_CN"`,
-    ''
-  ];
-  fs.readdirSync(`${dataPath}/account`).forEach(file => {
-    lines.push(`include "./account/${file}"`)
-  })
-  fs.readdirSync(`${dataPath}/month`).forEach(file => {
-    lines.push(`include "./month/${file}"`)
-  })
-  lines.push('')
-  return lines;
-}
+  const getAccounts = (accountKeys) => accountKeys.map(accountKey => `${config.startDate} open ${accountKey} ${config.operatingCurrency}`)
+  const files = [
+    [`${dataPath}/account/assets.bean`, getAccounts(initData.assets).join('\r\n')],
+    [`${dataPath}/account/equity.bean`, getAccounts(initData.equity).join('\r\n')],
+    [`${dataPath}/account/expenses.bean`, getAccounts(initData.expenses).join('\r\n')],
+    [`${dataPath}/account/income.bean`, getAccounts(initData.income).join('\r\n')],
+    [`${dataPath}/account/liabilities.bean`, getAccounts(initData.liabilities).join('\r\n')],
+  ]
 
-const init = () => {
+  // index.bean 初始化内容
+  const indexLines = () => {
+    let lines = [
+      `option "title" "${title}"`,
+      `option "operating_currency" "${operatingCurrency}"`,
+      'option "render_commas" "TRUE"',
+      '',
+      `${startDate} custom "fava-option" "interval" "day"`,
+      `${startDate} custom "fava-option" "language" "zh_CN"`,
+      ''
+    ];
+    fs.readdirSync(`${dataPath}/account`).forEach(file => {
+      lines.push(`include "./account/${file}"`)
+    })
+    fs.readdirSync(`${dataPath}/month`).forEach(file => {
+      lines.push(`include "./month/${file}"`)
+    })
+    lines.push('')
+    return lines;
+  }
+
+
   dirs.forEach(d => {
     if (!fs.existsSync(d)) {
       fs.mkdirSync(d)
@@ -61,6 +71,19 @@ const init = () => {
       fs.writeFileSync(fArray[0], fArray[1])
     }
   })
+
+  const ledgerConfig = JSON.parse(fs.readFileSync('./config/ledger_config.json'))
+  ledgerConfig[ledgerId] = {
+    id: ledgerId,
+    secret: "",
+    title,
+    dataPath,
+    operatingCurrency,
+    startDate
+  }
+  fs.writeFileSync('./config/ledger_config.json', JSON.stringify(ledgerConfig))
+  Cache.LedgerConfig = ledgerConfig
+
   console.log("Success init!")
 }
 
