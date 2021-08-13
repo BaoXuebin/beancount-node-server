@@ -31,13 +31,16 @@ const getAccountCata = account => {
 const getAccountType = account => {
   const array = account.split(':')
   if (array && array.length >= 2) {
-    return account.split(':')[1]
+    return account.split(':')[array.length - 1]
+  }
+  if (array && array.length >= 3) {
+    return account.split(':')[array.length - 2]
   }
   return ''
 }
 const getAccountName = account => {
   const array = account.split(':')
-  if (array && array.length >= 3) {
+  if (array && array.length >= 2) {
     return account.split(':')[array.length - 1]
   }
   return ''
