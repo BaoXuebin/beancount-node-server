@@ -3,7 +3,7 @@ const config = require('../config/config.json')
 const initData = require('../config/init_data.json');
 const Cache = require('./cache');
 
-const init = (ledgerId, title, operatingCurrency, startDate) => {
+const init = (ledgerId, mail, title, operatingCurrency, startDate) => {
   let dataPath = config.dataPath
   if (ledgerId) {
     dataPath = `${config.dataPath}/${ledgerId}`
@@ -15,8 +15,8 @@ const init = (ledgerId, title, operatingCurrency, startDate) => {
 
   // 初始化必须的文件结构
   const dirs = [
-    config.dataPath,
-    dataPath,
+    config.dataPath, // 文件存储目录
+    dataPath, // 账本存储目录
     `${dataPath}/account`,
     `${dataPath}/month`,
   ]
@@ -28,6 +28,7 @@ const init = (ledgerId, title, operatingCurrency, startDate) => {
     [`${dataPath}/account/expenses.bean`, getAccounts(initData.expenses).join('\r\n')],
     [`${dataPath}/account/income.bean`, getAccounts(initData.income).join('\r\n')],
     [`${dataPath}/account/liabilities.bean`, getAccounts(initData.liabilities).join('\r\n')],
+    [`${config.dataPath}/ledger_config.json`, "{}"],
   ]
 
   // index.bean 初始化内容
@@ -72,16 +73,16 @@ const init = (ledgerId, title, operatingCurrency, startDate) => {
     }
   })
 
-  const ledgerConfig = JSON.parse(fs.readFileSync('./config/ledger_config.json'))
+  const ledgerConfig = JSON.parse(fs.readFileSync(`${config.dataPath}/ledger_config.json`))
   ledgerConfig[ledgerId] = {
     id: ledgerId,
-    secret: "",
+    mail,
     title,
     dataPath,
     operatingCurrency,
     startDate
   }
-  fs.writeFileSync('./config/ledger_config.json', JSON.stringify(ledgerConfig))
+  fs.writeFileSync(`${config.dataPath}/ledger_config.json`, JSON.stringify(ledgerConfig))
   Cache.LedgerConfig = ledgerConfig
 
   console.log("Success init!")

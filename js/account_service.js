@@ -1,8 +1,8 @@
 const fs = require('fs');
 const process = require('child_process')
-const AccountTypes = require('../config/account_cata_list.json');
 const Cache = require('./cache');
 const { getAccountCata, readFileByLines, lineToMap, getAccountTypeDict, commentAccount } = require('./utils');
+const AccountTypeDict = require('../config/account_type');
 
 const initAllLedgerAccountCache = () => {
   Object.values(Cache.LedgerConfig).forEach(config => {
@@ -45,6 +45,7 @@ const getValidAccountLike = (config, key) => {
 const getAllAccounts = (config) => {
   const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean balances`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
+  // 每个账户的金额
   const amountAccounts = bqlResultSet.map(r => {
     const arr = r.trim().split(/\s+/)
     if (arr.length === 3) {
@@ -56,7 +57,8 @@ const getAllAccounts = (config) => {
     }
     return null;
   }).filter(a => a);
-  const amountAccountKeys = amountAccounts.map(acc => acc.account);
+
+  const amountAccountKeys = amountAccounts.map(acc => acc.account)
   return Cache.Accounts[config.id].filter(acc => !acc.endDate).map(acc => {
     acc.type = getAccountTypeDict(acc.account)
     if (amountAccountKeys.indexOf(acc.account) >= 0) {
@@ -102,17 +104,7 @@ const closeAccount = (config, account, date) => {
   }
 }
 
-const getAllAcountTypes = (cata) => {
-  let accountCata = AccountTypes
-  if (cata) {
-    return AccountTypes[cata] ? AccountTypes[cata].map(type => ({ key: `${cata}:${type.key}`, name: type.name })) : []
-  }
-  let result = []
-  Object.keys(accountCata).forEach(cata => {
-    result = result.concat(AccountTypes[cata].map(type => ({ key: `${cata}:${type.key}`, name: type.name })))
-  })
-  return result;
-}
+const getAllAcountTypes = () => Object.keys(AccountTypeDict).map(key => ({ key, name: AccountTypeDict[key] }))
 
 module.exports = {
   initAccountCache,

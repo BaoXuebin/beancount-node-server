@@ -1,4 +1,4 @@
-const { getAccountCata } = require('./utils');
+const { getAccountCata, getSha1Str } = require('./utils');
 const Cache = require('./cache');
 
 const isBlank = str => {
@@ -42,9 +42,19 @@ const validateAccountCloseDate = (config, account, date) => {
   return true;
 }
 
+const isMailAndSecretMatch = (mail, secret) => {
+  const ledgerConfig = Object.values(Cache.LedgerConfig).filter(ledger => ledger.mail === mail)[0]
+  // 邮箱存在，则校验密码
+  if (ledgerConfig) {
+    return getSha1Str(mail + secret) === ledgerConfig.id
+  }
+  return true
+}
+
 module.exports = {
   isBlank,
   isBalance,
+  isMailAndSecretMatch,
   validateAccount,
   validateAccountCloseDate
 }

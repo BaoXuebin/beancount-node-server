@@ -2,6 +2,16 @@ const dayjs = require('dayjs');
 const fs = require('fs');
 const process = require('child_process');
 
+const getLatest100Payee = (config) => {
+  let bql = 'SELECT distinct payee order by date desc limit 100';
+  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResultSet = bqlResult.split('\n').splice(2);
+  return bqlResultSet.filter(r => r).map(r => {
+    const rArray = r.trim().split(/\s+/)
+    return rArray[0]
+  })
+}
+
 const addEntry = (config, entry) => {
   const { date, payee, desc, entries } = entry
   let str = `\r\n${date} * "${payee || ''}" "${desc}"`;
@@ -66,6 +76,7 @@ const listItemByCondition = (config, { type, year, month }) => {
 const execCmd = cmd => process.execSync(cmd).toString()
 
 module.exports = {
+  getLatest100Payee,
   addEntry,
   listItemByCondition,
   execCmd

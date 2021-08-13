@@ -1,0 +1,19 @@
+module.exports = {
+  "Assets:Fixed": "固定资产",
+  "Assets:Invest": "投资",
+  "Assets:Flow": "现金流",
+  "Expenses:Life:Food": "饮食",
+  "Expenses:Life:Travel": "出行",
+  "Expenses:Life:Shopping": "购物",
+  "Expenses:Life:House": "居住",
+  "Expenses:Life:Subscribe": "订阅",
+  "Expenses:Life:Exchange": "转账",
+  "Expenses:Life:Hobby": "爱好",
+  "Expenses:Work": "工作支出",
+  "Expenses:Life": "生活消费",
+  "Income:Work": "工作收入",
+  "Income:Gov": "财政补贴",
+  "Income:Invest": "投资收益",
+  "Liabilities:Cycle": "周期性贷款",
+  "Liabilities:Life": "消费贷款"
+}

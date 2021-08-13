@@ -1,7 +1,7 @@
 const express = require('express')
-const { isBlank, validateAccount, validateAccountCloseDate, isBalance } = require('./js/validate')
+const { isBlank, validateAccount, validateAccountCloseDate, isBalance, isMailAndSecretMatch } = require('./js/validate')
 const { initAccountCache, initAllLedgerAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, closeAccount, getAllAcountTypes } = require('./js/account_service')
-const { addEntry, listItemByCondition, execCmd } = require('./js/api')
+const { addEntry, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
 const { getLedgerList, newLedger, initLedgerCache } = require('./js/ledger')
 const { statsTotalAmount } = require('./js/stats')
 const { json } = require('express')
@@ -19,7 +19,7 @@ app.use(express.json())
 app.use(express.static('public'))
 app.use('/api', router);
 // 统一处理 ledgerId
-router.all('/auth/**', function(req, res, next) {
+router.all('/auth/**', function (req, res, next) {
   const ledgerId = req.header('ledgerId')
   if (isBlank(ledgerId)) {
     return res.json(error(1010))
@@ -37,9 +37,11 @@ router.get('/ledger', function (req, res) {
 })
 
 router.post('/ledger', function (req, res) {
-  const { mail } = req.body
+  const { mail, secret } = req.body
   if (isBlank(mail)) {
     res.json(badRequest())
+  } else if (!isMailAndSecretMatch(mail, secret)) {
+    res.json(error(1006))
   } else {
     res.json(ok(newLedger(req.body)))
   }
@@ -70,7 +72,6 @@ router.get('/auth/account/type', function (req, res) {
   res.json(ok(getAllAcountTypes(req.query.cata)))
 })
 
-
 // 新增账户
 router.post('/auth/account', function (req, res) {
   const { account, date } = req.query;
@@ -96,6 +97,12 @@ router.post('/auth/account/close', function (req, res) {
     res.json(ok(closeAccount(req.ledgerConfig, account, date)))
   }
 })
+
+// 查询最近100个商户
+router.get('/auth/payee', function (req, res) {
+  res.json(ok(getLatest100Payee(req.ledgerConfig)))
+})
+
 
 // 记账
 router.post('/auth/entry', function (req, res) {

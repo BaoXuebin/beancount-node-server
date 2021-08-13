@@ -1,6 +1,7 @@
 const fs = require('fs');
-const AccountTypes = require('../config/account_cata_list.json');
 const config = require('../config/config.json');
+const AccountTypeDict = require('../config/account_type')
+const crypto = require('crypto');
 
 // 忽略注释行
 const isCommnetLine = line => line.startsWith('* ');
@@ -47,15 +48,14 @@ const getAccountName = account => {
 }
 
 const getAccountTypeDict = account => {
-  const cataTypes = AccountTypes[getAccountCata(account)]
-  if (cataTypes) {
-    const arr = cataTypes.filter(ct => ct.key === getAccountType(account))
-    if (arr.length > 0) {
-      return arr[0]
-    }
+  const accountTypeKeys = Object.keys(AccountTypeDict);
+  const key = accountTypeKeys.filter(typeKey => account.includes(typeKey))[0]
+  if (key) {
+    return { key, name: AccountTypeDict[key] }
   }
-  const accType = getAccountType(account)
-  return { key: accType, value: accType }
+
+  const accountTypeName = account.split(":").reverse()[0]
+  return { key: accountTypeName, name: accountTypeName }
 }
 
 const commentAccount = (account, keyword) => {
@@ -74,6 +74,12 @@ const commentAccount = (account, keyword) => {
   fs.writeFileSync(beanfilePath, content, 'utf8');
 }
 
+const getSha1Str = (str) => {
+  const shasum = crypto.createHash('sha1')
+  shasum.update(str)
+  return shasum.digest('hex')
+}
+
 module.exports = {
   readFileByLines,
   lineToMap,
@@ -81,5 +87,6 @@ module.exports = {
   getAccountType,
   getAccountTypeDict,
   getAccountName,
-  commentAccount
+  commentAccount,
+  getSha1Str
 }
