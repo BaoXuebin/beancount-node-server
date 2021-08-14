@@ -3,7 +3,7 @@ const { isBlank, validateAccount, validateAccountCloseDate, isBalance, isMailAnd
 const { initAccountCache, initAllLedgerAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, closeAccount, getAllAcountTypes } = require('./js/account_service')
 const { addEntry, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
 const { getLedgerList, newLedger, initLedgerCache } = require('./js/ledger')
-const { statsTotalAmount } = require('./js/stats')
+const { statsTotalAmount, statsLedgerMonths } = require('./js/stats')
 const { json } = require('express')
 const Cache = require('./js/cache')
 const { ignoreInvalidCharAndBlank, ignoreInvalidChar } = require('./js/utils')
@@ -105,7 +105,6 @@ router.get('/auth/payee', function (req, res) {
   res.json(ok(getLatest100Payee(req.ledgerConfig)))
 })
 
-
 // 记账
 router.post('/auth/entry', function (req, res) {
   const entry = req.body;
@@ -148,6 +147,11 @@ router.get('/auth/stats/exec', function (req, res) {
   } else {
     res.json(ok(execCmd(cmd)))
   }
+})
+
+// 统计所有记账的月份
+router.get('/auth/stats/months', function (req, res) {
+  res.json(ok(statsLedgerMonths(req.ledgerConfig)))
 })
 
 app.listen(port, () => {

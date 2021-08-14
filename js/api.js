@@ -18,14 +18,15 @@ const addEntry = (config, entry) => {
   entries.forEach(e => {
     str += `\r\n  ${e.account} ${Number(e.amount).toFixed(2)} ${config.operatingCurrency}`
   })
-  const currentMonth = dayjs().format("YYYY-MM");
-  const monthBeanFile = `${config.dataPath}/month/${currentMonth}.bean`;
+  const transactionMonth = dayjs(date).format("YYYY-MM");
+  const monthBeanFile = `${config.dataPath}/month/${transactionMonth}.bean`;
   // 月度账单不存在，则创建
   if (!fs.existsSync(monthBeanFile)) {
-    fs.writeFileSync(monthBeanFile, '')
-    fs.appendFileSync(`${config.dataPath}/index.bean`, `\r\ninclude "./month/${currentMonth}.bean"`)
+    fs.writeFileSync(monthBeanFile, str)
+    fs.appendFileSync(`${config.dataPath}/index.bean`, `\r\ninclude "./month/${transactionMonth}.bean"`)
+  } else {
+    fs.appendFileSync(monthBeanFile, `\r\n${str}`)
   }
-  fs.appendFileSync(`${config.dataPath}/month/${dayjs().format("YYYY-MM")}.bean`, `\r\n${str}`)
   return str;
 }
 

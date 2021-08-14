@@ -20,6 +20,17 @@ const statsTotalAmount = (config, year, month) => {
   return obj;
 }
 
+const statsLedgerMonths = (config) => {
+  let bql = 'SELECT distinct year(date), month(date)';
+  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResultSet = bqlResult.split('\n').splice(2);
+  return bqlResultSet.filter(a => a).map(r => {
+    const arr = r.trim().split(/\s+/)
+    return `${arr[0]}-${arr[1]}`
+  });
+}
+
 module.exports = {
-  statsTotalAmount
+  statsTotalAmount,
+  statsLedgerMonths
 }
