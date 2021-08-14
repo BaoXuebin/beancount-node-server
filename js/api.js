@@ -13,7 +13,7 @@ const getLatest100Payee = (config) => {
 }
 
 const addEntry = (config, entry) => {
-  const { date, payee, desc, entries } = entry
+  let { date, payee, desc, entries } = entry
   let str = `\r\n${date} * "${payee || ''}" "${desc}"`;
   entries.forEach(e => {
     str += `\r\n  ${e.account} ${Number(e.amount).toFixed(2)} ${config.operatingCurrency}`
@@ -67,6 +67,16 @@ const listItemByCondition = (config, { type, year, month }) => {
         account: rArray[3],
         amount: rArray[4],
         operatingCurrency: rArray[5]
+      }
+    } else if (rArray.length > 7) { // narration 含有空格
+      return {
+        id: rArray[0],
+        date: rArray[1],
+        payee: rArray[2],
+        desc: rArray.slice(3, rArray.length - 3).join(' '),
+        account: rArray[rArray.length - 3],
+        amount: rArray[rArray.length - 2],
+        operatingCurrency: rArray[rArray.length - 1]
       }
     }
     return null;

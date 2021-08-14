@@ -80,6 +80,9 @@ const getSha1Str = (str) => {
   return shasum.digest('hex')
 }
 
+const ignoreInvalidChar = rawStr => rawStr.replace(/("|\\)*/g, '')
+const ignoreInvalidCharAndBlank = rawStr => rawStr.replace(/(\s|"|\\)*/g, '')
+
 module.exports = {
   readFileByLines,
   lineToMap,
@@ -88,5 +91,7 @@ module.exports = {
   getAccountTypeDict,
   getAccountName,
   commentAccount,
-  getSha1Str
+  getSha1Str,
+  ignoreInvalidChar,
+  ignoreInvalidCharAndBlank
 }

@@ -6,6 +6,7 @@ const { getLedgerList, newLedger, initLedgerCache } = require('./js/ledger')
 const { statsTotalAmount } = require('./js/stats')
 const { json } = require('express')
 const Cache = require('./js/cache')
+const { ignoreInvalidCharAndBlank, ignoreInvalidChar } = require('./js/utils')
 
 const app = express()
 const port = 3001
@@ -74,7 +75,8 @@ router.get('/auth/account/type', function (req, res) {
 
 // 新增账户
 router.post('/auth/account', function (req, res) {
-  const { account, date } = req.query;
+  const date = req.query.date;
+  const account = ignoreInvalidCharAndBlank(req.query.account)
   if (!validateAccount(req.ledgerConfig, account)) {
     // 无效账户
     res.json(error(1003))
@@ -107,6 +109,9 @@ router.get('/auth/payee', function (req, res) {
 // 记账
 router.post('/auth/entry', function (req, res) {
   const entry = req.body;
+  entry.payee = ignoreInvalidCharAndBlank(req.body.payee)
+  entry.desc = ignoreInvalidChar(req.body.payee)
+
   if (!entry || isBlank(entry.date) || isBlank(entry.desc) || !entry.entries) {
     res.json(badRequest())
   } else if (!isBalance(entry.entries)) {
