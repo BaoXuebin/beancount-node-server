@@ -1,6 +1,7 @@
 const dayjs = require('dayjs');
 const fs = require('fs');
 const process = require('child_process');
+const { getSha1Str } = require('./utils');
 
 const getLatest100Payee = (config) => {
   let bql = 'SELECT distinct payee order by date desc limit 100';
@@ -86,9 +87,41 @@ const listItemByCondition = (config, { type, year, month }) => {
 
 const execCmd = cmd => process.execSync(cmd).toString()
 
+const getTransactionTemplate = (config) => {
+  const transactionTemplateFIlePath = `${config.dataPath}/transaction_template.json`
+  if (!fs.existsSync(transactionTemplateFIlePath)) {
+    return []
+  }
+  return JSON.parse(fs.readFileSync(transactionTemplateFIlePath) || '[]')
+}
+
+const addTransactionTemplate = (config, template) => {
+  template.id = getSha1Str(String(new Date().getTime()))
+  const transactionTemplateFIlePath = `${config.dataPath}/transaction_template.json`
+  let oldTemplates = [];
+  if (fs.existsSync(transactionTemplateFIlePath)) {
+    oldTemplates = JSON.parse(fs.readFileSync(transactionTemplateFIlePath) || '[]')
+  }
+  oldTemplates.push(template)
+
+  fs.writeFileSync(transactionTemplateFIlePath, JSON.stringify(oldTemplates))
+  return template;
+}
+
+const deleteTransactionTemplate = (config, templateId) => {
+  const transactionTemplateFIlePath = `${config.dataPath}/transaction_template.json`
+  let oldTemplates = JSON.parse(fs.readFileSync(transactionTemplateFIlePath) || '[]')
+  oldTemplates = oldTemplates.filter(template => template.id !== templateId)
+  fs.writeFileSync(transactionTemplateFIlePath, JSON.stringify(oldTemplates))
+  return templateId;
+}
+
 module.exports = {
   getLatest100Payee,
   addEntry,
   listItemByCondition,
-  execCmd
+  execCmd,
+  addTransactionTemplate,
+  getTransactionTemplate,
+  deleteTransactionTemplate
 }

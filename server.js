@@ -1,7 +1,7 @@
 const express = require('express')
 const { isBlank, validateAccount, validateAccountCloseDate, isBalance, isMailAndSecretMatch } = require('./js/validate')
 const { initAccountCache, initAllLedgerAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, closeAccount, getAllAcountTypes } = require('./js/account_service')
-const { addEntry, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
+const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
 const { getLedgerList, newLedger, initLedgerCache } = require('./js/ledger')
 const { statsTotalAmount, statsLedgerMonths } = require('./js/stats')
 const { json } = require('express')
@@ -128,6 +128,28 @@ router.get('/auth/entry', function (req, res) {
   } else {
     res.json(ok(listItemByCondition(req.ledgerConfig, { type, year, month })))
   }
+})
+
+// 查询记账模版
+router.get('/auth/transaction/template', function (req, res) {
+  res.json(ok(getTransactionTemplate(req.ledgerConfig)))
+})
+
+// 新增记账模版
+router.post('/auth/transaction/template', function (req, res) {
+  const template = req.body;
+  if (!template) {
+    return res.json(badRequest())
+  }
+  res.json(ok(addTransactionTemplate(req.ledgerConfig, template)))
+})
+
+router.delete('/auth/transaction/template', function (req, res) {
+  const templateId = req.query.id
+  if (isBlank(templateId)) {
+    return res.json(badRequest())
+  }
+  res.json(ok(deleteTransactionTemplate(req.ledgerConfig, templateId)))
 })
 
 // 统计总资产
