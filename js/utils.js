@@ -80,8 +80,8 @@ const getSha1Str = (str) => {
   return shasum.digest('hex')
 }
 
-const ignoreInvalidChar = rawStr => rawStr.replace(/("|\\)*/g, '')
-const ignoreInvalidCharAndBlank = rawStr => rawStr.replace(/(\s|"|\\)*/g, '')
+const ignoreInvalidChar = rawStr => rawStr ? rawStr.replace(/("|\\)*/g, '') : ''
+const ignoreInvalidCharAndBlank = rawStr => rawStr ? rawStr.replace(/(\s|"|\\)*/g, '') : ''
 
 module.exports = {
   readFileByLines,

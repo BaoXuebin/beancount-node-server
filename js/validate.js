@@ -1,5 +1,6 @@
 const { getAccountCata, getSha1Str } = require('./utils');
 const Cache = require('./cache');
+const { Decimal } = require('decimal.js');
 
 const isBlank = str => {
   return !str || !(str.trim())
@@ -21,11 +22,11 @@ const validateAccount = (config, account) => {
 }
 
 const isBalance = (entries) => {
-  let sum = 0;
+  let sum = Decimal(0);
   entries.forEach(e => {
-    sum += Number(e.amount)
+    sum = sum.plus(Decimal(e.amount))
   })
-  return sum === 0
+  return Number(sum) === 0
 }
 
 const validateAccountCloseDate = (config, account, date) => {

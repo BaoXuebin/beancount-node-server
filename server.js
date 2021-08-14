@@ -110,8 +110,7 @@ router.get('/auth/payee', function (req, res) {
 router.post('/auth/entry', function (req, res) {
   const entry = req.body;
   entry.payee = ignoreInvalidCharAndBlank(req.body.payee)
-  entry.desc = ignoreInvalidChar(req.body.payee)
-
+  entry.desc = ignoreInvalidChar(req.body.desc)
   if (!entry || isBlank(entry.date) || isBlank(entry.desc) || !entry.entries) {
     res.json(badRequest())
   } else if (!isBalance(entry.entries)) {
