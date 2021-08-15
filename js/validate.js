@@ -21,6 +21,11 @@ const validateAccount = (config, account) => {
   return true;
 }
 
+const validateAccountType = (type) => {
+  const accountCata = getAccountCata(type)
+  return ['Assets', 'Income', 'Expenses', 'Liabilities', 'Equity'].includes(accountCata);
+}
+
 const isBalance = (entries) => {
   let sum = Decimal(0);
   entries.forEach(e => {
@@ -57,5 +62,6 @@ module.exports = {
   isBalance,
   isMailAndSecretMatch,
   validateAccount,
+  validateAccountType,
   validateAccountCloseDate
 }

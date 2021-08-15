@@ -1,14 +1,9 @@
 const fs = require('fs');
 const process = require('child_process')
 const Cache = require('./cache');
+const DefaultAccountType = require('../config/account_type.json')
 const { getAccountCata, readFileByLines, lineToMap, getAccountTypeDict, commentAccount } = require('./utils');
-const AccountTypeDict = require('../config/account_type');
-
-const initAllLedgerAccountCache = () => {
-  Object.values(Cache.LedgerConfig).forEach(config => {
-    initAccountCache(config)
-  })
-}
+const { getLedgerAccountTypesFilePath } = require('./path');
 
 const initAccountCache = (config) => {
   const beanAccountFiles = fs.readdirSync(`${config.dataPath}/account`)
@@ -32,6 +27,19 @@ const initAccountCache = (config) => {
     })
   })
   Cache.Accounts[config.id] = Object.values(dict)
+  console.log(`Success init cache: [${config.mail} accounts]`)
+}
+
+const initAccountTypesCache = (config) => {
+  const ledgerAccountTypeFilePath = getLedgerAccountTypesFilePath(config.dataPath)
+  console.log(ledgerAccountTypeFilePath)
+  if (fs.existsSync(ledgerAccountTypeFilePath)) {
+    Cache.AccountTypes[config.id] = JSON.parse(fs.readFileSync(ledgerAccountTypeFilePath))
+  } else {
+    Cache.AccountTypes[config.id] = DefaultAccountType
+    fs.writeFileSync(ledgerAccountTypeFilePath, JSON.stringify(DefaultAccountType))
+  }
+  console.log(`Success init cache: [${config.mail} accountTypes]`)
 }
 
 const getAllValidAcount = (config) => {
@@ -60,7 +68,7 @@ const getAllAccounts = (config) => {
 
   const amountAccountKeys = amountAccounts.map(acc => acc.account)
   return Cache.Accounts[config.id].filter(acc => !acc.endDate).map(acc => {
-    acc.type = getAccountTypeDict(acc.account)
+    acc.type = getAccountTypeDict(config, acc.account)
     if (amountAccountKeys.indexOf(acc.account) >= 0) {
       const amountAccount = amountAccounts.filter(a => a.account === acc.account)[0]
       return Object.assign(acc, amountAccount)
@@ -84,7 +92,7 @@ const addAccount = (config, account, date) => {
   return {
     account,
     startDate: date,
-    type: getAccountTypeDict(account)
+    type: getAccountTypeDict(config, account)
   }
 }
 
@@ -104,15 +112,32 @@ const closeAccount = (config, account, date) => {
   }
 }
 
-const getAllAcountTypes = () => Object.keys(AccountTypeDict).map(key => ({ key, name: AccountTypeDict[key] }))
+const addAccountType = (config, type, name) => {
+  const ledgerAccountTypeFilePath = `${config.dataPath}/account_type.json`
+  if (fs.existsSync(ledgerAccountTypeFilePath)) {
+    const AccountTypeDict = JSON.parse(fs.readFileSync(ledgerAccountTypeFilePath))
+    AccountTypeDict[type] = name;
+    Cache.AccountTypes[config.id] = AccountTypeDict
+    fs.writeFileSync(ledgerAccountTypeFilePath, JSON.stringify(AccountTypeDict))
+    return { key: type, name }
+  }
+  return null;
+}
+
+const getAllAcountTypes = (config, cata) => {
+  const AccountTypeDict = Cache.AccountTypes[config.id]
+  return Object.keys(AccountTypeDict).filter(key => !cata || key.startsWith(cata)).map(key => ({ key, name: AccountTypeDict[key] }))
+}
+
 
 module.exports = {
   initAccountCache,
-  initAllLedgerAccountCache,
+  initAccountTypesCache,
   getAllValidAcount,
   getValidAccountLike,
   getAllAccounts,
   addAccount,
   closeAccount,
+  addAccountType,
   getAllAcountTypes
 }

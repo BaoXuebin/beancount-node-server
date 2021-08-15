@@ -1,12 +1,15 @@
 const express = require('express')
-const { isBlank, validateAccount, validateAccountCloseDate, isBalance, isMailAndSecretMatch } = require('./js/validate')
-const { initAccountCache, initAllLedgerAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, closeAccount, getAllAcountTypes } = require('./js/account_service')
+const fs = require('fs')
+const { isBlank, validateAccount, validateAccountType, validateAccountCloseDate, isBalance, isMailAndSecretMatch } = require('./js/validate')
+const { initAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, getAllAcountTypes, initAccountTypesCache } = require('./js/account_service')
 const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
-const { getLedgerList, newLedger, initLedgerCache } = require('./js/ledger')
+const { getLedgerList, newLedger } = require('./js/ledger')
 const { statsTotalAmount, statsLedgerMonths } = require('./js/stats')
 const { json } = require('express')
 const Cache = require('./js/cache')
+const Config = require('./config/config.json')
 const { ignoreInvalidCharAndBlank, ignoreInvalidChar } = require('./js/utils')
+const { getLedgerConfigFilePath } = require('./js/path')
 
 const app = express()
 const port = 3001
@@ -68,9 +71,23 @@ router.get('/auth/account/all', function (req, res) {
   res.json(ok(getAllAccounts(req.ledgerConfig)))
 })
 
-// 模糊查询账户
+// 查询账户类型
 router.get('/auth/account/type', function (req, res) {
-  res.json(ok(getAllAcountTypes(req.query.cata)))
+  res.json(ok(getAllAcountTypes(req.ledgerConfig, req.query.cata)))
+})
+
+// 新增账户类型
+router.post('/auth/account/type', function (req, res) {
+  const name = req.query.name;
+  const type = ignoreInvalidCharAndBlank(req.query.type)
+  if (!validateAccountType(type)) {
+    // 无效账户
+    res.json(error(1003))
+  } else if (isBlank(type) || isBlank(name)) {
+    res.json(badRequest())
+  } else {
+    res.json(ok(addAccountType(req.ledgerConfig, type, name)))
+  }
 })
 
 // 新增账户
@@ -176,8 +193,18 @@ router.get('/auth/stats/months', function (req, res) {
   res.json(ok(statsLedgerMonths(req.ledgerConfig)))
 })
 
-app.listen(port, () => {
-  initLedgerCache();
-  initAllLedgerAccountCache();
+app.listen(port, '0.0.0.0', () => {
+  const ledgerConfigFilePath = getLedgerConfigFilePath(Config.dataPath)
+  if (fs.existsSync(ledgerConfigFilePath)) {
+    Cache.LedgerConfig = JSON.parse(fs.readFileSync(ledgerConfigFilePath))
+    console.log('Success init cache: [ledger config]')
+  } else {
+    Cache.LedgerConfig = {}
+    console.log('Success init cache: [ledger config]')
+  }
+  Object.values(Cache.LedgerConfig).forEach(config => {
+    initAccountCache(config)
+    initAccountTypesCache(config)
+  })
   console.log(`Example app listening at http://localhost:${port}`)
 })

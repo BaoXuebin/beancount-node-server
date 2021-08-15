@@ -1,4 +1,4 @@
-module.exports = {
+{
   "Assets:Fixed": "固定资产",
   "Assets:Invest": "投资",
   "Assets:Flow": "现金流",

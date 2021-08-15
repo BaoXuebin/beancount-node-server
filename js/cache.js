@@ -1,6 +1,7 @@
 const Cache = {
   LedgerConfig: {},
-  Accounts: {}
+  Accounts: {},
+  AccountTypes: {}
 }
 
 module.exports = Cache

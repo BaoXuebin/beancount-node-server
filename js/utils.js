@@ -1,7 +1,7 @@
 const fs = require('fs');
 const config = require('../config/config.json');
-const AccountTypeDict = require('../config/account_type')
 const crypto = require('crypto');
+const Cache = require('./cache');
 
 // 忽略注释行
 const isCommnetLine = line => line.startsWith('* ');
@@ -47,7 +47,8 @@ const getAccountName = account => {
   return ''
 }
 
-const getAccountTypeDict = account => {
+const getAccountTypeDict = (config, account) => {
+  const AccountTypeDict = Cache.AccountTypes[config.id]
   const accountTypeKeys = Object.keys(AccountTypeDict);
   const key = accountTypeKeys.filter(typeKey => account.includes(typeKey))[0]
   if (key) {

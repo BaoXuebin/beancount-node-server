@@ -1,7 +1,9 @@
 const fs = require('fs');
 const config = require('../config/config.json')
 const initData = require('../config/init_data.json');
+const DefaultAccountType = require('../config/account_type.json');
 const Cache = require('./cache');
+const { getLedgerAccountTypesFilePath, getLedgerConfigFilePath } = require('./path');
 
 const init = (ledgerId, mail, title, operatingCurrency, startDate) => {
   let dataPath = config.dataPath
@@ -73,7 +75,9 @@ const init = (ledgerId, mail, title, operatingCurrency, startDate) => {
     }
   })
 
-  const ledgerConfig = JSON.parse(fs.readFileSync(`${config.dataPath}/ledger_config.json`))
+  // 初始化账本配置
+  const ledgerConfigFilePath = getLedgerConfigFilePath(config.dataPath)
+  const ledgerConfig = JSON.parse(fs.readFileSync(ledgerConfigFilePath))
   ledgerConfig[ledgerId] = {
     id: ledgerId,
     mail,
@@ -82,10 +86,16 @@ const init = (ledgerId, mail, title, operatingCurrency, startDate) => {
     operatingCurrency,
     startDate
   }
-  fs.writeFileSync(`${config.dataPath}/ledger_config.json`, JSON.stringify(ledgerConfig))
-  Cache.LedgerConfig = ledgerConfig
+  fs.writeFileSync(ledgerConfigFilePath, JSON.stringify(ledgerConfig))
+  console.log(`Create file: ${ledgerConfigFilePath}`)
 
-  console.log("Success init!")
+  Cache.LedgerConfig = ledgerConfig
+  console.log(`Success init ${mail} ledger config!`)
+
+  // 创建 accountTypes
+  const ledgerAccountTypesFilePath = getLedgerAccountTypesFilePath(dataPath)
+  fs.writeFileSync(ledgerAccountTypesFilePath, JSON.stringify(DefaultAccountType))
+  console.log(`Create file: ${ledgerAccountTypesFilePath}`)
 }
 
 module.exports = init
