@@ -1,7 +1,7 @@
 const express = require('express')
 const fs = require('fs')
 const { isBlank, validateAccount, validateAccountType, validateAccountCloseDate, isBalance, isMailAndSecretMatch } = require('./js/validate')
-const { initAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, getAllAcountTypes, initAccountTypesCache } = require('./js/account_service')
+const { initAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, balanceAccount, getAllAcountTypes, initAccountTypesCache } = require('./js/account_service')
 const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
 const { getLedgerList, newLedger } = require('./js/ledger')
 const { statsTotalAmount, statsLedgerMonths } = require('./js/stats')
@@ -10,6 +10,7 @@ const Cache = require('./js/cache')
 const Config = require('./config/config.json')
 const { ignoreInvalidCharAndBlank, ignoreInvalidChar } = require('./js/utils')
 const { getLedgerConfigFilePath } = require('./js/path')
+const dayjs = require('dayjs')
 
 const app = express()
 const port = 3001
@@ -114,6 +115,16 @@ router.post('/auth/account/close', function (req, res) {
     return json(error(1002))
   } else {
     res.json(ok(closeAccount(req.ledgerConfig, account, date)))
+  }
+})
+
+// 关闭账户
+router.post('/auth/account/balance', function (req, res) {
+  const { account, amount } = req.query;
+  if (isBlank(account) || isBlank(amount) || !validateAccount(req.ledgerConfig, account)) {
+    res.json(badRequest())
+  } else {
+    res.json(ok(balanceAccount(req.ledgerConfig, account, dayjs().format('YYYY-MM-DD'), amount)))
   }
 })
 

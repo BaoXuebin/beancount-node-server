@@ -7,7 +7,7 @@ const isBlank = str => {
 }
 
 const validateAccount = (config, account) => {
-  if (account.split(':').length < 3) {
+  if (account.split(':').length < 2) {
     return false
   }
   const accountCata = getAccountCata(account)

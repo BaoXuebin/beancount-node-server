@@ -4,6 +4,7 @@ const Cache = require('./cache');
 const DefaultAccountType = require('../config/account_type.json')
 const { getAccountCata, readFileByLines, lineToMap, getAccountTypeDict, commentAccount } = require('./utils');
 const { getLedgerAccountTypesFilePath } = require('./path');
+const dayjs = require('dayjs');
 
 const initAccountCache = (config) => {
   const beanAccountFiles = fs.readdirSync(`${config.dataPath}/account`)
@@ -112,6 +113,15 @@ const closeAccount = (config, account, date) => {
   }
 }
 
+const balanceAccount = (config, account, date, amount) => {
+  const month = dayjs(date).format('YYYY-MM');
+  const yesterday = dayjs(date).add(-1, 'day').format('YYYY-MM-DD');
+  const str = `${yesterday} pad ${account} Equity:OpeningBalances\r\n${date} balance ${account} ${amount} ${config.operatingCurrency}`
+  fs.appendFileSync(`${config.dataPath}/month/${month}.bean`, `\r\n${str}`)
+
+  return { account, date, amount}
+}
+
 const addAccountType = (config, type, name) => {
   const ledgerAccountTypeFilePath = `${config.dataPath}/account_type.json`
   if (fs.existsSync(ledgerAccountTypeFilePath)) {
@@ -138,6 +148,7 @@ module.exports = {
   getAllAccounts,
   addAccount,
   closeAccount,
+  balanceAccount,
   addAccountType,
   getAllAcountTypes
 }
