@@ -4,7 +4,7 @@ const { isBlank, validateAccount, validateAccountType, validateAccountCloseDate,
 const { initAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, balanceAccount, getAllAcountTypes, initAccountTypesCache } = require('./js/account_service')
 const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
 const { getLedgerList, newLedger } = require('./js/ledger')
-const { statsTotalAmount, statsLedgerMonths } = require('./js/stats')
+const { statsTotalAmount, statsSubAccountPercent, statsLedgerMonths } = require('./js/stats')
 const { dirFile, readFile, writeFile } = require('./js/source_file')
 const { json } = require('express')
 const Cache = require('./js/cache')
@@ -220,6 +220,14 @@ router.get('/auth/stats/exec', function (req, res) {
 // 统计所有记账的月份
 router.get('/auth/stats/months', function (req, res) {
   res.json(ok(statsLedgerMonths(req.ledgerConfig)))
+})
+
+// 统计账户子类占比分布
+router.get('/auth/stats/account/percent', function (req, res) {
+  if (isBlank(req.query.prefix)) {
+    return res.json(badRequest())
+  }
+  res.json(ok(statsSubAccountPercent(req.ledgerConfig, req.query.prefix)))
 })
 
 app.listen(port, '0.0.0.0', () => {

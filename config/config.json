@@ -3,5 +3,5 @@
   "dataPath": "/beancount",
   "operatingCurrency": "CNY",
   "startDate": "1970-01-01",
-  "isBak": false
+  "isBak": true
 }

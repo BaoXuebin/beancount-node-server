@@ -20,6 +20,24 @@ const statsTotalAmount = (config, year, month) => {
   return obj;
 }
 
+const statsSubAccountPercent = (config, prefix, year, month) => {
+  const subAccountLevel = prefix.split(':').filter(a => a).length + 1
+  let bql = `SELECT ${year ? 'year, ' : ''} ${month ? 'month, ' : ''} root(account, ${subAccountLevel}) as subAccount, sum(position) WHERE account ~ '${prefix}' ${year ? 'AND month = ' + month : ''} ${month ? 'AND year = ' + year : ''} GROUP BY subAccount`;
+  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResultSet = bqlResult.split('\n').splice(2);
+  return bqlResultSet.map(r => {
+    const arr = r.trim().split(/\s+/)
+    if (arr.length === 3) {
+      return {
+        account: arr[0],
+        amount: arr[1],
+        operatingCurrency: arr[2]
+      }
+    }
+    return null;
+  }).filter(a => a);
+}
+
 const statsLedgerMonths = (config) => {
   let bql = 'SELECT distinct year(date), month(date)';
   const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
@@ -32,5 +50,6 @@ const statsLedgerMonths = (config) => {
 
 module.exports = {
   statsTotalAmount,
+  statsSubAccountPercent,
   statsLedgerMonths
 }
