@@ -33,7 +33,6 @@ const initAccountCache = (config) => {
 
 const initAccountTypesCache = (config) => {
   const ledgerAccountTypeFilePath = getLedgerAccountTypesFilePath(config.dataPath)
-  console.log(ledgerAccountTypeFilePath)
   if (fs.existsSync(ledgerAccountTypeFilePath)) {
     Cache.AccountTypes[config.id] = JSON.parse(fs.readFileSync(ledgerAccountTypeFilePath))
   } else {

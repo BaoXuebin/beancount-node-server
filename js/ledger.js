@@ -10,7 +10,6 @@ const { getLedgerConfigFilePath } = require('./path');
 const newLedger = ({ mail, secret, title, operatingCurrency, startDate }) => {
   const ledgerId = getSha1Str(mail + secret)
   init(ledgerId, mail, title, operatingCurrency, startDate)
-  console.log(Cache.LedgerConfig[ledgerId])
   initAccountCache(Cache.LedgerConfig[ledgerId])
   initAccountTypesCache(Cache.LedgerConfig[ledgerId])
   return ledgerId

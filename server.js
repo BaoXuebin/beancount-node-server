@@ -5,6 +5,7 @@ const { initAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts
 const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
 const { getLedgerList, newLedger } = require('./js/ledger')
 const { statsTotalAmount, statsLedgerMonths } = require('./js/stats')
+const { dirFile, readFile, writeFile } = require('./js/source_file')
 const { json } = require('express')
 const Cache = require('./js/cache')
 const Config = require('./config/config.json')
@@ -178,6 +179,23 @@ router.delete('/auth/transaction/template', function (req, res) {
     return res.json(badRequest())
   }
   res.json(ok(deleteTransactionTemplate(req.ledgerConfig, templateId)))
+})
+
+// 读取文件列表
+router.get('/auth/file/dir', function (req, res) {
+  res.json(ok(dirFile(req.ledgerConfig)))
+})
+
+// 读取文件内容
+router.get('/auth/file/content', function (req, res) {
+  const { path } = req.query;
+  res.json(ok(readFile(req.ledgerConfig, path)))
+})
+
+// 保存文件内容
+router.post('/auth/file', function (req, res) {
+  const { path, content } = req.body;
+  res.json(ok(writeFile(req.ledgerConfig, path, content)))
 })
 
 // 统计总资产
