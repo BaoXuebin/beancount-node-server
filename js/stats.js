@@ -21,8 +21,10 @@ const statsTotalAmount = (config, year, month) => {
 }
 
 const statsSubAccountPercent = (config, prefix, year, month) => {
-  const subAccountLevel = prefix.split(':').filter(a => a).length + 1
-  let bql = `SELECT ${year ? 'year, ' : ''} ${month ? 'month, ' : ''} root(account, ${subAccountLevel}) as subAccount, sum(position) WHERE account ~ '${prefix}' ${year ? 'AND month = ' + month : ''} ${month ? 'AND year = ' + year : ''} GROUP BY subAccount`;
+  // const subAccountLevel = prefix.split(':').filter(a => a).length + 4
+  // let bql = `SELECT ${year ? 'year, ' : ''} ${month ? 'month, ' : ''} root(account, ${subAccountLevel}) as subAccount, sum(position) WHERE account ~ '${prefix}' ${year ? 'AND month = ' + month : ''} ${month ? 'AND year = ' + year : ''} GROUP BY subAccount`;
+  let bql = `SELECT ${year ? 'year, ' : ''} ${month ? 'month, ' : ''} account, sum(position) WHERE account ~ '${prefix}' ${year ? 'AND month = ' + month : ''} ${month ? 'AND year = ' + year : ''} GROUP BY account`;
+  console.log(bql)
   const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.map(r => {
