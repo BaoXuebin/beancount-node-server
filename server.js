@@ -4,7 +4,7 @@ const { isBlank, validateAccount, validateAccountType, validateAccountCloseDate,
 const { initAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, balanceAccount, getAllAcountTypes, initAccountTypesCache } = require('./js/account_service')
 const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
 const { getLedgerList, newLedger } = require('./js/ledger')
-const { statsTotalAmount, statsSubAccountPercent, statsLedgerMonths } = require('./js/stats')
+const { statsTotalAmount, statsSubAccountPercent, statsAccountTrend, statsLedgerMonths } = require('./js/stats')
 const { dirFile, readFile, writeFile } = require('./js/source_file')
 const { json } = require('express')
 const Cache = require('./js/cache')
@@ -227,7 +227,17 @@ router.get('/auth/stats/account/percent', function (req, res) {
   if (isBlank(req.query.prefix)) {
     return res.json(badRequest())
   }
-  res.json(ok(statsSubAccountPercent(req.ledgerConfig, req.query.prefix)))
+  const { prefix, year, month, level } = req.query
+  res.json(ok(statsSubAccountPercent(req.ledgerConfig, prefix, year, month, level)))
+})
+
+// 统计账户一段时间的变化趋势
+router.get('/auth/stats/account/trend', function (req, res) {
+  if (isBlank(req.query.prefix)) {
+    return res.json(badRequest())
+  }
+  const { prefix, year, month, type } = req.query
+  res.json(ok(statsAccountTrend(req.ledgerConfig, prefix, year, month, type)))
 })
 
 app.listen(port, '0.0.0.0', () => {
