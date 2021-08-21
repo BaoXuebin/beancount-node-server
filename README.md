@@ -34,7 +34,7 @@
 
 > Tips  
 > beancount 支持 account 的定义中包含中文，但是只能是最后一个节点（或者每个节点的第一个字符为英文，我不推荐这么定义，因为这会让 account 看起来很奇怪）。所以我习惯于将最后一个节点作为该 account 的中文注释。  
-> 例如：如果要创建一个公交车出行和支付宝资产这两个账户：公交车出行定义为 `Expenses:Travel:Bus:公交车` 和 `Assets:EBank:AliPay:支付宝`
+> 例如：如果要创建一个公交车出行和支付宝资产这两个账户：公交车出行定义为 `Expenses:Travel:Bus:公交车`，支付宝资产定义为 `Assets:EBank:AliPay:支付宝`
 
 
 ## 配置文件
