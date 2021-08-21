@@ -30,6 +30,7 @@ const init = (ledgerId, mail, title, operatingCurrency, startDate) => {
     [`${dataPath}/account/expenses.bean`, getAccounts(initData.expenses).join('\r\n')],
     [`${dataPath}/account/income.bean`, getAccounts(initData.income).join('\r\n')],
     [`${dataPath}/account/liabilities.bean`, getAccounts(initData.liabilities).join('\r\n')],
+    [`${dataPath}/history.bean`, ''],
     [`${config.dataPath}/ledger_config.json`, "{}"],
   ]
 
@@ -47,6 +48,7 @@ const init = (ledgerId, mail, title, operatingCurrency, startDate) => {
     fs.readdirSync(`${dataPath}/account`).forEach(file => {
       lines.push(`include "./account/${file}"`)
     })
+    lines.push(`include "./history.bean"`)
     fs.readdirSync(`${dataPath}/month`).forEach(file => {
       lines.push(`include "./month/${file}"`)
     })

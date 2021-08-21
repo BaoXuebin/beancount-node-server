@@ -30,12 +30,12 @@ const getAccountCata = account => {
   return ''
 }
 const getAccountType = account => {
-  const array = account.split(':')
-  if (array && array.length >= 2) {
-    return account.split(':')[array.length - 1]
-  }
-  if (array && array.length >= 3) {
-    return account.split(':')[array.length - 2]
+  const array = account.split(':').reverse()
+  for (let i = 0; i < array.length; i++) {
+    const type = array[i]
+    if (new RegExp('^[a-zA-Z]').test(type)) {
+      return type
+    }
   }
   return ''
 }
