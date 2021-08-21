@@ -58,7 +58,6 @@ const statsAccountTrend = (config, prefix, year, month, type) => {
     return []
   }
   let bql = `SELECT date, ${queryAmount} WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? ' AND month = ' + month : ''} ${grouBy}`
-  console.log(bql)
   const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.map(r => {
@@ -84,9 +83,64 @@ const statsLedgerMonths = (config) => {
   });
 }
 
+const statsPayee = (config, prefix, year, month, type) => {
+  let bql = `SELECT payee, count(payee) as count, sum(position) WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? ' AND month = ' + month : ''} GROUP BY payee`
+  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResultSet = bqlResult.split('\n').splice(2);
+  return bqlResultSet.map(r => {
+    const arr = r.trim().split(/\s+/)
+    let value;
+    if (type === 'cot') {
+      value = Number(arr[1])
+    } else if (type === 'avg') {
+      value = Number((Number(arr[2]) / Number(arr[1])).toFixed(2))
+    } else {
+      value = Number(arr[2])
+    }
+    if (arr.length === 4) {
+      return {
+        payee: arr[0],
+        value,
+        operatingCurrency: arr[3]
+      }
+    }
+    return null;
+  }).filter(a => a).sort((a, b) => a.value - b.value);
+}
+
+const statsMonthIncomeExpenses = (config) => {
+  let monthIncomeBql = `SELECT year, month, neg(sum(position)) WHERE account ~ 'Income' group by year, month order by year, month`
+  let monthExpensesBql = `SELECT year, month, sum(position) WHERE account ~ 'Expenses' group by year, month order by year, month`
+  const bqls = [monthIncomeBql, monthExpensesBql]
+  let [income, expenses] = bqls.map(bql => {
+    const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+    const bqlResultSet = bqlResult.split('\n').splice(2);
+    return bqlResultSet.map(r => {
+      const arr = r.trim().split(/\s+/)
+      if (arr.length === 4) {
+        return { month: `${arr[0]}-${arr[1]}`, amount: Number(arr[2]), operatingCurrency: arr[3] }
+      }
+      return null;
+    }).filter(a => a);
+  })
+  const incomeResult = income.map(inc => Object.assign({ type: '收入' }, inc))
+  const expensesResult = expenses.map(exp => Object.assign({ type: '支出' }, exp))
+  const balanceResult = income.map(inc => {
+    const filterArr = expenses.filter(exp => inc.month === exp.month)
+    if (filterArr && filterArr.length > 0) {
+      inc.amount = Number((inc.amount - filterArr[0].amount).toFixed(2))
+      inc.type = '结余'
+    }
+    return inc
+  })
+  return incomeResult.concat(expensesResult).concat(balanceResult)
+}
+
 module.exports = {
   statsTotalAmount,
   statsSubAccountPercent,
   statsAccountTrend,
-  statsLedgerMonths
+  statsLedgerMonths,
+  statsPayee,
+  statsMonthIncomeExpenses
 }

@@ -4,7 +4,7 @@ const { isBlank, validateAccount, validateAccountType, validateAccountCloseDate,
 const { initAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, balanceAccount, getAllAcountTypes, initAccountTypesCache } = require('./js/account_service')
 const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
 const { getLedgerList, newLedger } = require('./js/ledger')
-const { statsTotalAmount, statsSubAccountPercent, statsAccountTrend, statsLedgerMonths } = require('./js/stats')
+const { statsTotalAmount, statsSubAccountPercent, statsAccountTrend, statsLedgerMonths, statsPayee, statsMonthIncomeExpenses } = require('./js/stats')
 const { dirFile, readFile, writeFile } = require('./js/source_file')
 const { json } = require('express')
 const Cache = require('./js/cache')
@@ -239,6 +239,21 @@ router.get('/auth/stats/account/trend', function (req, res) {
   const { prefix, year, month, type } = req.query
   res.json(ok(statsAccountTrend(req.ledgerConfig, prefix, year, month, type)))
 })
+
+// 统计payee
+router.get('/auth/stats/payee', function (req, res) {
+  if (isBlank(req.query.prefix)) {
+    return res.json(badRequest())
+  }
+  const { prefix, year, month, type } = req.query
+  res.json(ok(statsPayee(req.ledgerConfig, prefix, year, month, type)))
+})
+
+// 按月统计收支
+router.get('/auth/stats/month/incomeExpenses', function (req, res) {
+  res.json(ok(statsMonthIncomeExpenses(req.ledgerConfig)))
+})
+
 
 app.listen(port, '0.0.0.0', () => {
   const ledgerConfigFilePath = getLedgerConfigFilePath(Config.dataPath)
