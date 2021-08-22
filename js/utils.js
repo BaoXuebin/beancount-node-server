@@ -8,7 +8,7 @@ const isCommnetLine = line => line.startsWith('* ');
 
 // 读取文件行
 const readFileByLines = (path) => {
-  const lines = fs.readFileSync(path, 'utf-8').split('\r\n')
+  const lines = fs.readFileSync(path, 'utf-8').split(/[\r\n]/)
   return lines.filter(l => l && !isCommnetLine(l))
 }
 
