@@ -1,5 +1,9 @@
 # beancount-node-server
 
+![release version](https://img.shields.io/github/v/release/BaoXuebin/beancount-node-server)
+![docker image version](https://img.shields.io/docker/v/xdbin/beancount-ns/1.0?label=docker%20image%20tag)
+![docker image size](https://img.shields.io/docker/image-size/xdbin/beancount-ns/1.0?label=docker%20image%20size)
+
 [演示地址](http://81.69.252.147:10000/)
 [接口文档](https://github.com/BaoXuebin/beancount-node-server/blob/main/API.md)
 
