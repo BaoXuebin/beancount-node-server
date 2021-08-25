@@ -7,4 +7,3 @@ services:
       - "10000:3001"
     volumes:
       - "/data/beancount:/beancount"
-      - "/data/beancount/icons:/app/public/icons"
