@@ -9,15 +9,17 @@ const { dirFile, readFile, writeFile } = require('./js/source_file')
 const { json } = require('express')
 const Cache = require('./js/cache')
 const Config = require('./config/config.json')
-const { ignoreInvalidCharAndBlank, ignoreInvalidChar } = require('./js/utils')
+const { ignoreInvalidCharAndBlank, ignoreInvalidChar, getAccountType } = require('./js/utils')
 const { getLedgerConfigFilePath } = require('./js/path')
 const dayjs = require('dayjs')
+const multer = require('multer')
 
 const app = express()
 const port = 3001
 const ok = data => ({ code: 200, data })
 const badRequest = () => ({ code: 400 })
 const error = code => ({ code })
+const upload = multer({ dest: '/tmp/' });
 
 const router = express.Router();
 
@@ -117,6 +119,25 @@ router.post('/auth/account/close', function (req, res) {
   } else {
     res.json(ok(closeAccount(req.ledgerConfig, account, date)))
   }
+})
+
+router.post('/auth/account/icon', upload.single('file'), function (req, res) {
+  let ext = ''
+  const extArr = req.file.originalname.split('.')
+  if (extArr && extArr.length === 2) {
+    ext = '.' + extArr[1]
+  }
+  var file = Config.iconPath + '/' + getAccountType(req.query.account) + ext;
+  fs.rename(req.file.path, file, function (err) {
+    if (err) {
+      console.log(err);
+      res.json(error());
+    } else {
+      res.json({
+        filename: file
+      });
+    }
+  });
 })
 
 // 关闭账户

@@ -3,5 +3,6 @@
   "dataPath": "/beancount",
   "operatingCurrency": "CNY",
   "startDate": "1970-01-01",
-  "isBak": true
+  "isBak": true,
+  "iconPath": "./public/icons"
 }
