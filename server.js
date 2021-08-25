@@ -128,7 +128,7 @@ router.post('/auth/account/icon', upload.single('file'), function (req, res) {
     ext = '.' + extArr[1]
   }
   var file = './public/icons/' + getAccountType(req.query.account) + ext;
-  fs.rename(req.file.path, file, function (err) {
+  fs.copyFile(req.file.path, file, function (err) {
     if (err) {
       console.log(err);
       res.status(500).json(error());
