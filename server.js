@@ -19,7 +19,7 @@ const port = 3001
 const ok = data => ({ code: 200, data })
 const badRequest = () => ({ code: 400 })
 const error = code => ({ code })
-const upload = multer({ dest: '/tmp/' });
+const upload = multer({ dest: `${Config.dataPath}/icon-tmp/` });
 
 const router = express.Router();
 
