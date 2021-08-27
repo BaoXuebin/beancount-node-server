@@ -54,11 +54,15 @@
 
 `account_type.json`
 
-用于对 beancount 的 account 进行归类，当创建一个账本后，会默认在账本对应目录维护一个用于该账本的 `account_type.json` 文件
+用于对 beancount 的 account 进行归类，当创建一个账本后，会默认在账本对应目录维护一个用于该账本的 account_type.json 文件
 
 `init_data.json`
 
 默认的 beancount 初始化 account 内容
+
+`white_list.json` 
+
+用户白名单，默认为空，不作限制；如需限制，在该文件中添加用户名称
 
 ## 部署
 ### Docker
