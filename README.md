@@ -1,6 +1,7 @@
 # beancount-node-server
 
 ![release version](https://img.shields.io/github/v/release/BaoXuebin/beancount-node-server)
+![license](https://img.shields.io/github/license/baoxuebin/beancount-node-server)
 
 [演示地址](https://beancount.xdbin.com/)
 [接口文档](https://github.com/BaoXuebin/beancount-node-server/blob/main/API.md)
