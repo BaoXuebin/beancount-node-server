@@ -118,4 +118,4 @@
 [@BaoXuebin](https://github.com/BaoXuebin)
 # 开源协议
 
-[MIT](https://github.com/BaoXuebin/beancount-node-server/blob/master/LICENSE) @BaoXuebin
+[MIT](https://github.com/BaoXuebin/beancount-node-server/blob/main/LICENSE) @BaoXuebin
