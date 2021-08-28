@@ -11,6 +11,8 @@
 
 本仓库使用 `node` 进行文本的读写和网络服务支持，利用 `bean-query` `bean-report` 获取内容并解析，以 Json 格式返回。并基于已实现的接口内置实现了前端页面（适配移动端）。
 
+![snapshot](https://cdn.xdbin.com/github/beancount-ns/snapshot.png)
+
 ## 特性
 
 - [X] 私有部署
