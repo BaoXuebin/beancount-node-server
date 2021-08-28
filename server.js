@@ -1,6 +1,6 @@
 const express = require('express')
 const fs = require('fs')
-const { isBlank, validateAccount, validateAccountType, validateAccountCloseDate, isBalance, isMailAndSecretMatch } = require('./js/validate')
+const { isBlank, validateAccount, validateAccountType, validateAccountCloseDate, isBalance, isMailAndSecretMatch, inWhiteList } = require('./js/validate')
 const { initAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, balanceAccount, getAllAcountTypes, initAccountTypesCache } = require('./js/account_service')
 const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
 const { getLedgerList, newLedger } = require('./js/ledger')
@@ -48,7 +48,9 @@ router.post('/ledger', function (req, res) {
   const { mail, secret } = req.body
   if (isBlank(mail)) {
     res.json(badRequest())
-  } else if (!isMailAndSecretMatch(mail, secret)) {
+  } else if (!inWhiteList(mail)) {
+    res.json(error(1006))
+  }  else if (!isMailAndSecretMatch(mail, secret)) {
     res.json(error(1006))
   } else {
     res.json(ok(newLedger(req.body)))

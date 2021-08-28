@@ -1,6 +1,4 @@
 const process = require('child_process');
-const { default: Decimal } = require('decimal.js');
-const e = require('express');
 
 const statsTotalAmount = (config, year, month) => {
   let bql = 'SELECT root(account, 1), sum(position)';

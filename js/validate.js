@@ -1,5 +1,6 @@
 const { getAccountCata, getSha1Str } = require('./utils');
 const Cache = require('./cache');
+const WhiteList = require('../config/white_list.json');
 const { Decimal } = require('decimal.js');
 
 const isBlank = str => {
@@ -57,10 +58,19 @@ const isMailAndSecretMatch = (mail, secret) => {
   return true
 }
 
+const inWhiteList = (mail) => {
+  // whitelist.json 为空则表示不作限制
+  if (WhiteList && WhiteList.length > 0) {
+    return WhiteList.includes(mail)
+  }
+  return true;
+}
+
 module.exports = {
   isBlank,
   isBalance,
   isMailAndSecretMatch,
+  inWhiteList,
   validateAccount,
   validateAccountType,
   validateAccountCloseDate

@@ -9,7 +9,10 @@ const { getLedgerConfigFilePath } = require('./path');
 // 新建账本
 const newLedger = ({ mail, secret, title, operatingCurrency, startDate }) => {
   const ledgerId = getSha1Str(mail + secret)
-  init(ledgerId, mail, title, operatingCurrency, startDate)
+  // 用户不存在，则初始化基本账本信息
+  if (!Cache.LedgerConfig[ledgerId]) {
+    init(ledgerId, mail, title, operatingCurrency, startDate)
+  }
   initAccountCache(Cache.LedgerConfig[ledgerId])
   initAccountTypesCache(Cache.LedgerConfig[ledgerId])
   return ledgerId
