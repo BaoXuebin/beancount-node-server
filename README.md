@@ -92,24 +92,24 @@
 > 公交车出行定义为 `Expenses:Travel:Bus:公交车`，支付宝资产定义为 `Assets:EBank:AliPay:支付宝`
 
 
-### 配置文件说明
+## 配置文件说明
 
-`config/config.json`  
+### config/config.json
 
 **title**: 账本名称  
 **dataPath**: 账本存储位置，初始化账本时使用  
 **operatingCurrency**: 账本币种
 **startDate**: 账本创建时间，初始化账本时使用
 
-`account_type.json`
+### config/account_type.json
 
 用于对 beancount 的 account 进行归类，当创建一个账本后，会默认在账本对应目录维护一个用于该账本的 account_type.json 文件
 
-`init_data.json`
+### config/init_data.json
 
 默认的 beancount 初始化 account 内容
 
-`white_list.json` 
+### config/white_list.json
 
 用户白名单，默认为空，不作限制；如需限制，在该文件中添加用户名称
 
