@@ -289,5 +289,5 @@ app.listen(port, '0.0.0.0', () => {
     initAccountCache(config)
     initAccountTypesCache(config)
   })
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`Beancount node server listening at http://localhost:${port}`)
 })

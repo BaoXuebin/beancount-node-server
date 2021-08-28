@@ -9,6 +9,7 @@ WORKDIR /app
 COPY package* yarn.lock server.js ./
 COPY config ./config
 COPY js ./js
+COPY public/icons ./public/default_icons
 COPY public ./public
 RUN yarn install
 
