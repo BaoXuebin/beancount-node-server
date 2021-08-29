@@ -18,7 +18,7 @@ const lineToMap = account => {
     date: words[0],
     type: words[1],
     account: words[2],
-    moneyType: words[3]
+    commodity: words[3]
   }
 }
 
@@ -81,6 +81,16 @@ const getSha1Str = (str) => {
   return shasum.digest('hex')
 }
 
+const getCommoditySymbol = commodity => {
+  commodity = commodity.toUpperCase()
+  if (commodity === 'CNY') {
+    return '￥'
+  } else if (commodity === 'USD') {
+    return '$'
+  }
+  return commodity
+}
+
 const ignoreInvalidChar = rawStr => rawStr ? rawStr.replace(/("|\\)*/g, '') : ''
 const ignoreInvalidCharAndBlank = rawStr => rawStr ? rawStr.replace(/(\s|"|\\)*/g, '') : ''
 
@@ -94,5 +104,6 @@ module.exports = {
   commentAccount,
   getSha1Str,
   ignoreInvalidChar,
-  ignoreInvalidCharAndBlank
+  ignoreInvalidCharAndBlank,
+  getCommoditySymbol
 }

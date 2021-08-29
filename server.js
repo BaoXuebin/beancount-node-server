@@ -100,13 +100,14 @@ router.post('/auth/account/type', function (req, res) {
 router.post('/auth/account', function (req, res) {
   const date = req.query.date;
   const account = ignoreInvalidCharAndBlank(req.query.account)
+  const commodity = ignoreInvalidCharAndBlank(req.query.commodity)
   if (!validateAccount(req.ledgerConfig, account)) {
     // 无效账户
     res.json(error(1003))
-  } else if (isBlank(account) || isBlank(date)) {
+  } else if (isBlank(account) || isBlank(date) || isBlank(commodity)) {
     res.json(badRequest())
   } else {
-    res.json(ok(addAccount(req.ledgerConfig, account, date)))
+    res.json(ok(addAccount(req.ledgerConfig, account, commodity, date)))
   }
 })
 

@@ -2,7 +2,7 @@ const fs = require('fs');
 const process = require('child_process')
 const Cache = require('./cache');
 const DefaultAccountType = require('../config/account_type.json')
-const { getAccountCata, readFileByLines, lineToMap, getAccountTypeDict, commentAccount } = require('./utils');
+const { getAccountCata, readFileByLines, lineToMap, getAccountTypeDict, commentAccount, getCommoditySymbol } = require('./utils');
 const { getLedgerAccountTypesFilePath } = require('./path');
 const dayjs = require('dayjs');
 
@@ -13,6 +13,7 @@ const initAccountCache = (config) => {
     let fileAccounts = readFileByLines(`${config.dataPath}/account/${beanAccountFile}`).map(line => lineToMap(line))
     fileAccounts.forEach(acc => {
       if (dict[acc.account]) {
+        dict[acc.account].commodity = acc.commodity
         if (acc.type === 'open') {
           dict[acc.account].startDate = acc.date
         } else {
@@ -20,9 +21,9 @@ const initAccountCache = (config) => {
         }
       } else {
         if (acc.type === 'open') {
-          dict[acc.account] = { account: acc.account, startDate: acc.date }
+          dict[acc.account] = { account: acc.account, startDate: acc.date, commodity: acc.commodity }
         } else {
-          dict[acc.account] = { account: acc.account, endDate: acc.date }
+          dict[acc.account] = { account: acc.account, endDate: acc.date, commodity: acc.commodity }
         }
       }
     })
@@ -43,7 +44,7 @@ const initAccountTypesCache = (config) => {
 }
 
 const getAllValidAcount = (config) => {
-  return Cache.Accounts[config.id].filter(acc => !acc.endDate).map(acc => acc.account).sort()
+  return Cache.Accounts[config.id].filter(acc => !acc.endDate).sort()
 }
 
 const getValidAccountLike = (config, key) => {
@@ -53,14 +54,29 @@ const getValidAccountLike = (config, key) => {
 const getAllAccounts = (config) => {
   const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean balances`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
+  console.log(bqlResultSet)
   // 每个账户的金额
   const amountAccounts = bqlResultSet.map(r => {
+    if (r.search(/\{(.+?)\}/)) { // 包含大括号，即包含汇率计算
+      r = r.replace('{', '').replace('}', '')
+    }
     const arr = r.trim().split(/\s+/)
     if (arr.length === 3) {
       return {
         account: arr[0],
         amount: arr[1],
-        operatingCurrency: arr[2]
+        commodity: arr[2],
+        commoditySymbol: getCommoditySymbol(arr[2])
+      }
+    } else if (arr.length === 5) { // 包含汇率转换
+      return {
+        account: arr[0],
+        amount: arr[1],
+        commodity: arr[2],
+        commoditySymbol: getCommoditySymbol(arr[2]),
+        price: arr[3],
+        priceCommodity: arr[4],
+        priceCommoditySymbol: getCommoditySymbol(arr[4]),
       }
     }
     return null;
@@ -77,20 +93,21 @@ const getAllAccounts = (config) => {
   })
 }
 
-const addAccount = (config, account, date) => {
+const addAccount = (config, account, commodity, date) => {
   const existAccount = Cache.Accounts[config.id].filter(acc => acc.account === account)[0]
   if (existAccount) { // 之前存在该账户
     date = existAccount.startDate
     delete existAccount.endDate;
     commentAccount(account, ' close ')
   } else {
-    Cache.Accounts[config.id].push({ account, startDate: date })
-    const str = `${date} open ${account} ${config.operatingCurrency}`
+    Cache.Accounts[config.id].push({ account, startDate: date, commodity })
+    const str = `${date} open ${account} ${commodity}`
     fs.appendFileSync(`${config.dataPath}/account/${getAccountCata(account).toLowerCase()}.bean`, `\r\n${str}`)
   }
 
   return {
     account,
+    commodity,
     startDate: date,
     type: getAccountTypeDict(config, account)
   }
