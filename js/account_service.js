@@ -51,7 +51,7 @@ const getValidAccountLike = (config, key) => {
 }
 
 const getAllAccounts = (config) => {
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean balances`).toString()
+  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" balances`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   // 每个账户的金额
   const amountAccounts = bqlResultSet.map(r => {
