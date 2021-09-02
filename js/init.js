@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Cache = require('./cache');
 const path = require('path')
-const { getLedgerAccountTypesFilePath } = require('./path');
+const { getLedgerAccountTypesFilePath, getLedgerTransactionTemplateFilePath } = require('./path');
 const { readFileByLines, lineToMap } = require('./utils');
 
 const initAccountCache = (config) => {
@@ -52,6 +52,13 @@ const initLedgerStructure = (config, exampleParentPath, dirs, files) => {
       fs.writeFileSync(filePath, fileContent)
       console.log(`[${config.mail}] create new file: ${filePath}`)
     }
+  }
+  // 兼容旧版本，配置文件进行拷贝
+  if (fs.existsSync(`${config.dataPath}/account_type.json`)) {
+    fs.copyFileSync(`${config.dataPath}/account_type.json`, getLedgerAccountTypesFilePath(config.dataPath));
+  }
+  if (fs.existsSync(`${config.dataPath}/transaction_template.json`)) {
+    fs.copyFileSync(`${config.dataPath}/transaction_template.json`, getLedgerTransactionTemplateFilePath(config.dataPath));
   }
 }
 
