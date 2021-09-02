@@ -50,7 +50,13 @@ const getAccountName = account => {
 const getAccountTypeDict = (config, account) => {
   const AccountTypeDict = Cache.AccountTypes[config.id]
   const accountTypeKeys = Object.keys(AccountTypeDict);
-  const key = accountTypeKeys.filter(typeKey => account.includes(typeKey))[0]
+  const keys = accountTypeKeys.filter(typeKey => account.includes(typeKey))
+  let key = '';
+  for (let k of keys) {
+    if (k.length > key.length) {
+      key = k;
+    }
+  }
   if (key) {
     return { key, name: AccountTypeDict[key] }
   }

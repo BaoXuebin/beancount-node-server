@@ -52,9 +52,10 @@ const getValidAccountLike = (config, key) => {
 }
 
 const getAllAccounts = (config) => {
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean balances`).toString()
+  // 账户市场价: select account, sum(convert(value(position), 'CNY'))
+  const cmd = `bean-query ${config.dataPath}/index.bean "select account, sum(convert(value(position), '${config.operatingCurrency}'))"`
+  const bqlResult = process.execSync(cmd).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
-  console.log(bqlResultSet)
   // 每个账户的金额
   const amountAccounts = bqlResultSet.map(r => {
     if (r.search(/\{(.+?)\}/)) { // 包含大括号，即包含汇率计算
@@ -87,7 +88,7 @@ const getAllAccounts = (config) => {
     acc.type = getAccountTypeDict(config, acc.account)
     if (amountAccountKeys.indexOf(acc.account) >= 0) {
       const amountAccount = amountAccounts.filter(a => a.account === acc.account)[0]
-      return Object.assign(acc, amountAccount)
+      return Object.assign(amountAccount, acc)
     }
     return acc
   })

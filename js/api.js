@@ -2,6 +2,7 @@ const dayjs = require('dayjs');
 const fs = require('fs');
 const process = require('child_process');
 const { getSha1Str, getCommoditySymbol } = require('./utils');
+const { getCommodityPriceFile } = require('./path');
 
 const getLatest100Payee = (config) => {
   let bql = 'SELECT distinct payee order by date desc limit 100';
@@ -22,6 +23,7 @@ const addEntry = (config, entry) => {
     // 不涉及币种转换
     if (priceCommodity && commodity !== priceCommodity) {
       str += ` {${price} ${priceCommodity}}`
+      fs.appendFileSync(getCommodityPriceFile(config.dataPath), `\r\n${date} price ${commodity} ${price} ${priceCommodity}`)
     }
   })
   const transactionMonth = dayjs(date).format("YYYY-MM");

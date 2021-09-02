@@ -21,6 +21,7 @@ const init = (ledgerId, mail, title, operatingCurrency, startDate) => {
     dataPath, // 账本存储目录
     `${dataPath}/account`,
     `${dataPath}/month`,
+    `${dataPath}/price`
   ]
 
   const getAccounts = (accountKeys) => accountKeys.map(accountKey => `${config.startDate} open ${accountKey} ${config.operatingCurrency}`)
@@ -31,6 +32,8 @@ const init = (ledgerId, mail, title, operatingCurrency, startDate) => {
     [`${dataPath}/account/income.bean`, getAccounts(initData.income).join('\r\n')],
     [`${dataPath}/account/liabilities.bean`, getAccounts(initData.liabilities).join('\r\n')],
     [`${dataPath}/history.bean`, ''],
+    [`${dataPath}/price/commodities.bean`, ''],
+    [`${dataPath}/price/price.bean`, ''],
     [`${config.dataPath}/ledger_config.json`, "{}"],
   ]
 
@@ -96,8 +99,10 @@ const init = (ledgerId, mail, title, operatingCurrency, startDate) => {
 
   // 创建 accountTypes
   const ledgerAccountTypesFilePath = getLedgerAccountTypesFilePath(dataPath)
-  fs.writeFileSync(ledgerAccountTypesFilePath, JSON.stringify(DefaultAccountType))
-  console.log(`Create file: ${ledgerAccountTypesFilePath}`)
+  if (!fs.existsSync(ledgerAccountTypesFilePath)) {
+    fs.writeFileSync(ledgerAccountTypesFilePath, JSON.stringify(DefaultAccountType))
+    console.log(`Create file: ${ledgerAccountTypesFilePath}`)
+  }
 }
 
 module.exports = init
