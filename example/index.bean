@@ -7,7 +7,11 @@ option "render_commas" "TRUE"
 1970-01-01 custom "fava-option" "language" "zh_CN"
 
 ; 账户定义
-include "./account/accounts.bean"
+include "./account/assets.bean"
+include "./account/equity.bean"
+include "./account/expenses.bean"
+include "./account/income.bean"
+include "./account/liabilities.bean"
 ; 数据
 include "./month/months.bean"
 ; 多币种配置

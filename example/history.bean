@@ -1,0 +1,3 @@
+%startDate% * "基金" "购买基金"
+  Assets:Flow:Bank:ICBC:工商银行 -2000 CNY
+  Assets:Invest:Fund:自定义基金 1000 SHR

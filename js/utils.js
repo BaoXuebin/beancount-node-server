@@ -1,7 +1,10 @@
 const fs = require('fs');
+const process = require('child_process')
 const config = require('../config/config.json');
 const crypto = require('crypto');
 const Cache = require('./cache');
+const iconv = require('iconv-lite')
+const path = require('path')
 
 // 忽略注释行
 const isCommnetLine = line => line.startsWith('* ');
@@ -100,6 +103,37 @@ const getCommoditySymbol = commodity => {
 const ignoreInvalidChar = rawStr => rawStr ? rawStr.replace(/("|\\)*/g, '') : ''
 const ignoreInvalidCharAndBlank = rawStr => rawStr ? rawStr.replace(/(\s|"|\\)*/g, '') : ''
 
+
+const execBeancountCmd = (cmd, params) => {
+  if (cmd === 'bean-query' && params && params.length === 2) {
+    return process.execSync(`${cmd} ${params.map(p => `"${p}"`).join(" ")}`).toString()
+  } else if (cmd === 'bean-report' && params && params.length === 2) {
+    cmd = `${cmd} ${params.map(p => `"${p}"`).join(" ")}`
+    const buffer = process.execSync(cmd, { encoding: 'buffer' })
+    return iconv.decode(buffer, 'cp936');
+  }
+}
+
+const getAllDirFiles = (paretPath, childDirPath) => {
+  let dirs = []
+  let files = []
+  const filePath = path.join(paretPath, childDirPath || '')
+  let exampleFiles = fs.readdirSync(filePath)
+  for (let childFilePath of exampleFiles) {
+    const stat = fs.statSync(path.join(filePath, childFilePath))
+    const childFullPath = path.join(childDirPath || '', childFilePath)
+    if (stat.isFile()) {
+      files.push(childFullPath)
+    } else if (stat.isDirectory()) {
+      dirs.push(childFullPath)
+      const result = getAllDirFiles(paretPath, childFullPath);
+      dirs = dirs.concat(result.dirs)
+      files = files.concat(result.files)
+    }
+  }
+  return { dirs, files };
+}
+
 module.exports = {
   readFileByLines,
   lineToMap,
@@ -111,5 +145,7 @@ module.exports = {
   getSha1Str,
   ignoreInvalidChar,
   ignoreInvalidCharAndBlank,
-  getCommoditySymbol
+  getCommoditySymbol,
+  execBeancountCmd,
+  getAllDirFiles
 }

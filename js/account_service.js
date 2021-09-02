@@ -1,47 +1,9 @@
 const fs = require('fs');
 const process = require('child_process')
 const Cache = require('./cache');
-const DefaultAccountType = require('../config/account_type.json')
-const { getAccountCata, readFileByLines, lineToMap, getAccountTypeDict, commentAccount, getCommoditySymbol } = require('./utils');
-const { getLedgerAccountTypesFilePath } = require('./path');
+const { getAccountCata, getAccountTypeDict, commentAccount, getCommoditySymbol } = require('./utils');
 const dayjs = require('dayjs');
-
-const initAccountCache = (config) => {
-  const beanAccountFiles = fs.readdirSync(`${config.dataPath}/account`)
-  let dict = {}
-  beanAccountFiles.forEach(beanAccountFile => {
-    let fileAccounts = readFileByLines(`${config.dataPath}/account/${beanAccountFile}`).map(line => lineToMap(line))
-    fileAccounts.forEach(acc => {
-      if (dict[acc.account]) {
-        dict[acc.account].commodity = acc.commodity
-        if (acc.type === 'open') {
-          dict[acc.account].startDate = acc.date
-        } else {
-          dict[acc.account].endDate = acc.date
-        }
-      } else {
-        if (acc.type === 'open') {
-          dict[acc.account] = { account: acc.account, startDate: acc.date, commodity: acc.commodity }
-        } else {
-          dict[acc.account] = { account: acc.account, endDate: acc.date, commodity: acc.commodity }
-        }
-      }
-    })
-  })
-  Cache.Accounts[config.id] = Object.values(dict)
-  console.log(`Success init cache: [${config.mail} accounts]`)
-}
-
-const initAccountTypesCache = (config) => {
-  const ledgerAccountTypeFilePath = getLedgerAccountTypesFilePath(config.dataPath)
-  if (fs.existsSync(ledgerAccountTypeFilePath)) {
-    Cache.AccountTypes[config.id] = JSON.parse(fs.readFileSync(ledgerAccountTypeFilePath))
-  } else {
-    Cache.AccountTypes[config.id] = DefaultAccountType
-    fs.writeFileSync(ledgerAccountTypeFilePath, JSON.stringify(DefaultAccountType))
-  }
-  console.log(`Success init cache: [${config.mail} accountTypes]`)
-}
+const { getLedgerAccountTypesFilePath } = require('./path');
 
 const getAllValidAcount = (config) => {
   return Cache.Accounts[config.id].filter(acc => !acc.endDate).sort()
@@ -136,11 +98,11 @@ const balanceAccount = (config, account, date, amount) => {
   const str = `${yesterday} pad ${account} Equity:OpeningBalances\r\n${date} balance ${account} ${amount} ${config.operatingCurrency}\r\n`
   fs.appendFileSync(`${config.dataPath}/month/${month}.bean`, `\r\n${str}`)
 
-  return { account, date, amount}
+  return { account, date, amount }
 }
 
 const addAccountType = (config, type, name) => {
-  const ledgerAccountTypeFilePath = `${config.dataPath}/account_type.json`
+  const ledgerAccountTypeFilePath = getLedgerAccountTypesFilePath(config.dataPath)
   if (fs.existsSync(ledgerAccountTypeFilePath)) {
     const AccountTypeDict = JSON.parse(fs.readFileSync(ledgerAccountTypeFilePath))
     AccountTypeDict[type] = name;
@@ -158,8 +120,6 @@ const getAllAcountTypes = (config, cata) => {
 
 
 module.exports = {
-  initAccountCache,
-  initAccountTypesCache,
   getAllValidAcount,
   getValidAccountLike,
   getAllAccounts,

@@ -1,18 +1,36 @@
 const fs = require('fs');
-const init = require('./init');
-const { initAccountCache, initAccountTypesCache } = require('./account_service');
+const { initLedgerStructure, initAccountCache } = require('./init');
 const Cache = require('./cache');
 const config = require('../config/config.json');
-const { getSha1Str } = require('./utils');
+const { getSha1Str, getAllDirFiles } = require('./utils');
 const { getLedgerConfigFilePath } = require('./path');
 
 // 新建账本
-const newLedger = ({ mail, secret, title, operatingCurrency, startDate }) => {
+const newLedger = ({ mail, secret, title = config.title, operatingCurrency = config.operatingCurrency, startDate = config.startDate }) => {
   const ledgerId = getSha1Str(mail + secret)
-  // 用户不存在，则初始化基本账本信息
-  init(ledgerId, mail, title, operatingCurrency, startDate)
-  initAccountCache(Cache.LedgerConfig[ledgerId])
-  initAccountTypesCache(Cache.LedgerConfig[ledgerId])
+  // 初始化账本配置
+  const ledgerConfigFilePath = getLedgerConfigFilePath(config.dataPath)
+  const ledgerConfig = JSON.parse(fs.readFileSync(ledgerConfigFilePath))
+  const dataPath = `${config.dataPath}/${ledgerId}`
+  ledgerConfig[ledgerId] = {
+    id: ledgerId,
+    mail,
+    title,
+    dataPath,
+    operatingCurrency,
+    startDate
+  }
+  fs.writeFileSync(ledgerConfigFilePath, JSON.stringify(ledgerConfig))
+  console.log(`Create file: ${ledgerConfigFilePath}`)
+  Cache.LedgerConfig = ledgerConfig
+  fs.mkdirSync(dataPath)
+  console.log(`Success init ${mail} ledger config!`)
+
+  // 初始化 beancount 账本文件结构
+  const { dirs, files } = getAllDirFiles('./example')
+  initLedgerStructure(ledgerConfig[ledgerId], './example', dirs, files);
+  // 初始化 account 和 accountType 缓存
+  initAccountCache(ledgerConfig[ledgerId]);
   return ledgerId
 }
 
