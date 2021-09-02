@@ -8,7 +8,7 @@ const statsTotalAmount = (config, year, month) => {
   if (month) {
     bql += `AND month = ${month}`
   }
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   let obj = {};
   bqlResultSet.forEach(r => {
@@ -28,7 +28,7 @@ const statsSubAccountPercent = (config, prefix, year, month, level) => {
   } else {
     bql = `SELECT account, sum(convert(value(position), '${config.operatingCurrency}')) WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? 'AND month = ' + month : ''} GROUP BY account`;
   }
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.map(r => {
     const arr = r.trim().split(/\s+/)
@@ -56,7 +56,7 @@ const statsAccountTrend = (config, prefix, year, month, type) => {
     return []
   }
   let bql = `SELECT date, ${queryAmount} WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? ' AND month = ' + month : ''} ${grouBy}`
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.map(r => {
     const arr = r.trim().split(/\s+/)
@@ -73,7 +73,7 @@ const statsAccountTrend = (config, prefix, year, month, type) => {
 
 const statsLedgerMonths = (config) => {
   let bql = 'SELECT distinct year(date), month(date)';
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.filter(a => a).map(r => {
     const arr = r.trim().split(/\s+/)
@@ -111,7 +111,7 @@ const statsMonthIncomeExpenses = (config) => {
   let monthExpensesBql = `SELECT year, month, sum(convert(value(position), 'CNY')) WHERE account ~ 'Expenses' group by year, month order by year, month`
   const bqls = [monthIncomeBql, monthExpensesBql]
   let [income, expenses] = bqls.map(bql => {
-    const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+    const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
     const bqlResultSet = bqlResult.split('\n').splice(2);
     return bqlResultSet.map(r => {
       const arr = r.trim().split(/\s+/)

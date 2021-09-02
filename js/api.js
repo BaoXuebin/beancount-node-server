@@ -6,7 +6,7 @@ const { getCommodityPriceFile } = require('./path');
 
 const getLatest100Payee = (config) => {
   let bql = 'SELECT distinct payee order by date desc limit 100';
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.filter(r => r).map(r => {
     const rArray = r.trim().split(/\s+/)
@@ -53,7 +53,7 @@ const listItemByCondition = (config, { type, year, month }) => {
     }
     bql = bql.replace(new RegExp(' AND $'), ';');
   }
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.filter(r => r).map(r => {
     const rArray = r.trim().split(/\s+/)
