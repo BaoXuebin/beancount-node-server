@@ -27,6 +27,8 @@ const addEntry = (config, entry) => {
       } else {
         str += ` @ ${price} ${priceCommodity}`
       }
+      // 平衡小数点误差
+      str += `\r\n  Equity:OpeningBalances`
       fs.appendFileSync(getCommodityPriceFile(config.dataPath), `\r\n${date} price ${commodity} ${price} ${priceCommodity}`)
     }
   })
