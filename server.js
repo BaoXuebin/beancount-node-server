@@ -286,6 +286,8 @@ app.listen(port, '0.0.0.0', () => {
     console.log('Success init cache: [ledger config]')
   } else {
     Cache.LedgerConfig = {}
+    fs.writeFileSync(ledgerConfigFilePath, '{}')
+    console.log('Success create file: ' + ledgerConfigFilePath)
     console.log('Success init cache: [ledger config]')
   }
 

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Cache = require('./cache');
 const path = require('path')
-const { getLedgerAccountTypesFilePath, getLedgerTransactionTemplateFilePath } = require('./path');
+const { getLedgerAccountTypesFilePath, getLedgerTransactionTemplateFilePath, getLedgerConfigFilePath } = require('./path');
 const { readFileByLines, lineToMap } = require('./utils');
 
 const initAccountCache = (config) => {

@@ -23,7 +23,9 @@ const newLedger = ({ mail, secret, title = config.title, operatingCurrency = con
   fs.writeFileSync(ledgerConfigFilePath, JSON.stringify(ledgerConfig))
   console.log(`Create file: ${ledgerConfigFilePath}`)
   Cache.LedgerConfig = ledgerConfig
-  fs.mkdirSync(dataPath)
+  if (!fs.existsSync(dataPath)) {
+    fs.mkdirSync(dataPath)
+  }
   console.log(`Success init ${mail} ledger config!`)
 
   // 初始化 beancount 账本文件结构
