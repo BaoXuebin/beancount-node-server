@@ -42,6 +42,25 @@ const initLedgerStructure = (config, exampleParentPath, dirs, files) => {
       console.log(`[${config.mail}] mkdir: ${dirPath}`)
     }
   }
+
+  // 兼容旧版本，配置文件进行拷贝
+  if (fs.existsSync(`${config.dataPath}/account_type.json`) && !fs.existsSync(getLedgerAccountTypesFilePath(config.dataPath))) {
+    fs.copyFileSync(`${config.dataPath}/account_type.json`, getLedgerAccountTypesFilePath(config.dataPath));
+    console.log(`[${config.mail}] Copy old file: ${getLedgerAccountTypesFilePath(config.dataPath)}`)
+  }
+  if (fs.existsSync(`${config.dataPath}/transaction_template.json`) && !fs.existsSync(getLedgerTransactionTemplateFilePath(config.dataPath))) {
+    fs.copyFileSync(`${config.dataPath}/transaction_template.json`, getLedgerTransactionTemplateFilePath(config.dataPath));
+    console.log(`[${config.mail}] Copy old file: ${getLedgerTransactionTemplateFilePath(config.dataPath)}`)
+  }
+
+  // 生成 months.bean 文件
+  const monthsFilePath = path.join(config.dataPath, '/month/months.bean')
+  if (!fs.existsSync(monthsFilePath)) {
+    const monthFiles = fs.readdirSync(path.join(config.dataPath, '/month'))
+    fs.writeFileSync(monthsFilePath, monthFiles.map(m => `include "./${m}"`).join('\r\n'))
+    console.log(`[${config.mail}] create new file: ${monthsFilePath}`)
+  }
+
   for (let file of files) {
     const filePath = path.join(config.dataPath, file)
     if (!fs.existsSync(filePath)) {
@@ -53,13 +72,6 @@ const initLedgerStructure = (config, exampleParentPath, dirs, files) => {
       console.log(`[${config.mail}] create new file: ${filePath}`)
     }
   }
-  // 兼容旧版本，配置文件进行拷贝
-  if (fs.existsSync(`${config.dataPath}/account_type.json`)) {
-    fs.copyFileSync(`${config.dataPath}/account_type.json`, getLedgerAccountTypesFilePath(config.dataPath));
-  }
-  if (fs.existsSync(`${config.dataPath}/transaction_template.json`)) {
-    fs.copyFileSync(`${config.dataPath}/transaction_template.json`, getLedgerTransactionTemplateFilePath(config.dataPath));
-  }
 }
 
 
@@ -67,4 +79,3 @@ module.exports = {
   initAccountCache,
   initLedgerStructure
 }
-

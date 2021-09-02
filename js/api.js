@@ -22,7 +22,11 @@ const addEntry = (config, entry) => {
     str += `\r\n  ${account} ${Number(amount).toFixed(2)} ${commodity}`
     // 不涉及币种转换
     if (priceCommodity && commodity !== priceCommodity) {
-      str += ` {${price} ${priceCommodity}}`
+      if (amount >= 0) {
+        str += ` {${price} ${priceCommodity}, ${date}}`
+      } else {
+        str += ` @ ${price} ${priceCommodity}`
+      }
       fs.appendFileSync(getCommodityPriceFile(config.dataPath), `\r\n${date} price ${commodity} ${price} ${priceCommodity}`)
     }
   })
