@@ -1,0 +1,6 @@
+%startDate% open Income:Work:Salary:工作收入 CNY
+%startDate% open Income:Work:Bonus:奖金 CNY
+%startDate% open Income:Work:Salary:单位公积金 CNY
+%startDate% open Income:Gov:退税 CNY
+%startDate% open Income:Gov:政府补贴 CNY
+%startDate% open Income:Invest:投资收益 CNY

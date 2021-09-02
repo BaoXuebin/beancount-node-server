@@ -1,0 +1,5 @@
+include "./assets.bean"
+include "./equity.bean"
+include "./expenses.bean"
+include "./income.bean"
+include "./liabilities.bean"
