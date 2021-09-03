@@ -1,8 +1,8 @@
 const fs = require('fs');
 const Cache = require('./cache');
 const path = require('path')
-const { getLedgerAccountTypesFilePath, getLedgerTransactionTemplateFilePath, getLedgerConfigFilePath } = require('./path');
-const { readFileByLines, lineToMap } = require('./utils');
+const { getLedgerAccountTypesFilePath, getLedgerTransactionTemplateFilePath } = require('./path');
+const { readFileByLines, lineToMap, log } = require('./utils');
 
 const initAccountCache = (config) => {
   const beanAccountFiles = fs.readdirSync(`${config.dataPath}/account`)
@@ -27,11 +27,11 @@ const initAccountCache = (config) => {
     })
   })
   Cache.Accounts[config.id] = Object.values(dict)
-  console.log(`Success init cache: [${config.mail} accounts]`)
+  log(config.mail, 'Success init account cache')
 
   const ledgerAccountTypeFilePath = getLedgerAccountTypesFilePath(config.dataPath)
   Cache.AccountTypes[config.id] = JSON.parse(fs.readFileSync(ledgerAccountTypeFilePath))
-  console.log(`Success init cache: [${config.mail} accountTypes]`)
+  log(config.mail, 'Success init accountType cache')
 }
 
 const initLedgerStructure = (config, exampleParentPath, dirs, files) => {
@@ -39,18 +39,18 @@ const initLedgerStructure = (config, exampleParentPath, dirs, files) => {
     const dirPath = path.join(config.dataPath, dir)
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath)
-      console.log(`[${config.mail}] mkdir: ${dirPath}`)
+      log(config.mail, `mkdir: ${dirPath}`)
     }
   }
 
   // 兼容旧版本，配置文件进行拷贝
   if (fs.existsSync(`${config.dataPath}/account_type.json`) && !fs.existsSync(getLedgerAccountTypesFilePath(config.dataPath))) {
     fs.copyFileSync(`${config.dataPath}/account_type.json`, getLedgerAccountTypesFilePath(config.dataPath));
-    console.log(`[${config.mail}] Copy old file: ${getLedgerAccountTypesFilePath(config.dataPath)}`)
+    log(config.mail, `copy old file: ${getLedgerAccountTypesFilePath(config.dataPath)}`)
   }
   if (fs.existsSync(`${config.dataPath}/transaction_template.json`) && !fs.existsSync(getLedgerTransactionTemplateFilePath(config.dataPath))) {
     fs.copyFileSync(`${config.dataPath}/transaction_template.json`, getLedgerTransactionTemplateFilePath(config.dataPath));
-    console.log(`[${config.mail}] Copy old file: ${getLedgerTransactionTemplateFilePath(config.dataPath)}`)
+    log(config.mail, `copy old file: ${getLedgerTransactionTemplateFilePath(config.dataPath)}`)
   }
 
   // 生成 months.bean 文件
@@ -58,7 +58,7 @@ const initLedgerStructure = (config, exampleParentPath, dirs, files) => {
   if (!fs.existsSync(monthsFilePath)) {
     const monthFiles = fs.readdirSync(path.join(config.dataPath, '/month'))
     fs.writeFileSync(monthsFilePath, monthFiles.map(m => `include "./${m}"`).join('\r\n'))
-    console.log(`[${config.mail}] create new file: ${monthsFilePath}`)
+    log(config.mail, `create new file: ${monthsFilePath}`)
   }
 
   for (let file of files) {
@@ -67,9 +67,10 @@ const initLedgerStructure = (config, exampleParentPath, dirs, files) => {
       let fileContent = fs.readFileSync(path.join(exampleParentPath, file)).toString()
       if (fileContent) {
         fileContent = fileContent.replace(/%startDate%/g, config.startDate)
+        fileContent = fileContent.replace(/%operatingCurrency%/g, config.operatingCurrency)
       }
       fs.writeFileSync(filePath, fileContent)
-      console.log(`[${config.mail}] create new file: ${filePath}`)
+      log(config.mail, `create new file: ${filePath}`)
     }
   }
 }

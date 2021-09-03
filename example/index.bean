@@ -1,5 +1,5 @@
 option "title" "我的账本"
-option "operating_currency" "CNY"
+option "operating_currency" "%operatingCurrency%"
 option "render_commas" "TRUE"
 
 ; fava 配置

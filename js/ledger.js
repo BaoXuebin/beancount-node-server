@@ -2,7 +2,7 @@ const fs = require('fs');
 const { initLedgerStructure, initAccountCache } = require('./init');
 const Cache = require('./cache');
 const config = require('../config/config.json');
-const { getSha1Str, getAllDirFiles } = require('./utils');
+const { getSha1Str, getAllDirFiles, log } = require('./utils');
 const { getLedgerConfigFilePath } = require('./path');
 
 // 新建账本
@@ -18,15 +18,16 @@ const newLedger = ({ mail, secret, title = config.title, operatingCurrency = con
     title,
     dataPath,
     operatingCurrency,
-    startDate
+    startDate,
+    isBak: config.isBak
   }
   fs.writeFileSync(ledgerConfigFilePath, JSON.stringify(ledgerConfig))
-  console.log(`Create file: ${ledgerConfigFilePath}`)
+  log(config.mail, `Create file: ${ledgerConfigFilePath}`)
   Cache.LedgerConfig = ledgerConfig
   if (!fs.existsSync(dataPath)) {
     fs.mkdirSync(dataPath)
   }
-  console.log(`Success init ${mail} ledger config!`)
+  log(config.mail, `Success init ledger config`)
 
   // 初始化 beancount 账本文件结构
   const { dirs, files } = getAllDirFiles('./example')

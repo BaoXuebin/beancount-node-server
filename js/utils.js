@@ -1,9 +1,6 @@
-const fs = require('fs');
-const process = require('child_process')
-const config = require('../config/config.json');
-const crypto = require('crypto');
-const Cache = require('./cache');
-const iconv = require('iconv-lite')
+const fs = require('fs')
+const crypto = require('crypto')
+const Cache = require('./cache')
 const path = require('path')
 
 // 忽略注释行
@@ -68,7 +65,7 @@ const getAccountTypeDict = (config, account) => {
   return { key: accountTypeName, name: accountTypeName }
 }
 
-const commentAccount = (account, keyword) => {
+const commentAccount = (config, account, keyword) => {
   const beanfilePath = `${config.dataPath}/account/${getAccountCata(account).toLowerCase()}.bean`;
   const accountLines = fs.readFileSync(beanfilePath, 'utf8').split('\r\n');
 
@@ -103,17 +100,6 @@ const getCommoditySymbol = commodity => {
 const ignoreInvalidChar = rawStr => rawStr ? rawStr.replace(/("|\\)*/g, '') : ''
 const ignoreInvalidCharAndBlank = rawStr => rawStr ? rawStr.replace(/(\s|"|\\)*/g, '') : ''
 
-
-const execBeancountCmd = (cmd, params) => {
-  if (cmd === 'bean-query' && params && params.length === 2) {
-    return process.execSync(`${cmd} ${params.map(p => `"${p}"`).join(" ")}`).toString()
-  } else if (cmd === 'bean-report' && params && params.length === 2) {
-    cmd = `${cmd} ${params.map(p => `"${p}"`).join(" ")}`
-    const buffer = process.execSync(cmd, { encoding: 'buffer' })
-    return iconv.decode(buffer, 'cp936');
-  }
-}
-
 const getAllDirFiles = (paretPath, childDirPath) => {
   let dirs = []
   let files = []
@@ -134,6 +120,14 @@ const getAllDirFiles = (paretPath, childDirPath) => {
   return { dirs, files };
 }
 
+const log = (user, content) => {
+  if (user) {
+    console.log(`[${user}] ${content}`)
+  } else {
+    console.log(content)
+  }
+}
+
 module.exports = {
   readFileByLines,
   lineToMap,
@@ -146,6 +140,6 @@ module.exports = {
   ignoreInvalidChar,
   ignoreInvalidCharAndBlank,
   getCommoditySymbol,
-  execBeancountCmd,
-  getAllDirFiles
+  getAllDirFiles,
+  log
 }
