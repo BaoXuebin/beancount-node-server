@@ -4,6 +4,7 @@ const Cache = require('./cache');
 const config = require('../config/config.json');
 const { getSha1Str, getAllDirFiles, log } = require('./utils');
 const { getLedgerConfigFilePath } = require('./path');
+const path = require('path');
 
 // 新建账本
 const newLedger = ({ mail, secret, title = config.title, operatingCurrency = config.operatingCurrency, startDate = config.startDate }) => {
@@ -29,8 +30,8 @@ const newLedger = ({ mail, secret, title = config.title, operatingCurrency = con
   }
   log(config.mail, `Success init ledger config`)
 
-  // 初始化 beancount 账本文件结构
-  const { dirs, files } = getAllDirFiles('./example')
+  // 初始化 beancount 账本文件结构，这里需要注意相对路径
+  const { dirs, files } = getAllDirFiles(path.join(__dirname, '../example'))
   initLedgerStructure(ledgerConfig[ledgerId], './example', dirs, files);
   // 初始化 account 和 accountType 缓存
   initAccountCache(ledgerConfig[ledgerId]);

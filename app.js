@@ -13,6 +13,7 @@ const { getLedgerConfigFilePath } = require('./js/path')
 const dayjs = require('dayjs')
 const multer = require('multer')
 const { initLedgerStructure, initAccountCache } = require('./js/init');
+const path = require('path')
 
 const ok = data => ({ code: 200, data })
 const badRequest = () => ({ code: 400 })
@@ -21,7 +22,7 @@ const error = code => ({ code })
 const app = express()
 const router = express.Router();
 app.use(express.json())
-app.use(express.static('public'))
+app.use(express.static(path.join(__dirname, 'public')))
 app.use('/api', router);
 
 const registerRoute = (router, Config) => {
@@ -280,6 +281,10 @@ const registerRoute = (router, Config) => {
 }
 
 const BeancountNsApp = (Config, port) => {
+  // 文件不存在，自动创建
+  if (!fs.existsSync(Config.dataPath)) {
+    fs.mkdirSync(Config.dataPath, { recursive: true })
+  }
   // 初始化账本
   const ledgerConfigFilePath = getLedgerConfigFilePath(Config.dataPath)
   if (fs.existsSync(ledgerConfigFilePath)) {
@@ -292,7 +297,7 @@ const BeancountNsApp = (Config, port) => {
     log(null, 'Success init cache: [ledger config]')
   }
 
-  const { dirs, files } = getAllDirFiles('./example')
+  const { dirs, files } = getAllDirFiles(path.join(__dirname, 'example'))
   Object.values(Cache.LedgerConfig).forEach(config => {
     // 初始化 beancount 账本文件结构
     initLedgerStructure(config, './example', dirs, files);
