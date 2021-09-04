@@ -2,7 +2,7 @@ const dayjs = require('dayjs');
 const fs = require('fs');
 const process = require('child_process');
 const { getSha1Str, getCommoditySymbol } = require('./utils');
-const { getCommodityPriceFile, getLedgerTransactionTemplateFilePath } = require('./path');
+const { getCommodityPriceFile, getLedgerTransactionTemplateFilePath, getMonthsFilePath } = require('./path');
 
 const getLatest100Payee = (config) => {
   let bql = 'SELECT distinct payee order by date desc limit 100';
@@ -37,7 +37,7 @@ const addEntry = (config, entry) => {
   // 月度账单不存在，则创建
   if (!fs.existsSync(monthBeanFile)) {
     fs.writeFileSync(monthBeanFile, str)
-    fs.appendFileSync(`${config.dataPath}/index.bean`, `\r\ninclude "./month/${transactionMonth}.bean"`)
+    fs.appendFileSync(getMonthsFilePath(config.dataPath), `\r\ninclude "./${transactionMonth}.bean"`)
   } else {
     fs.appendFileSync(monthBeanFile, `\r\n${str}`)
   }

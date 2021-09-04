@@ -4,11 +4,13 @@ const getLedgerAccountTypesFilePath = dataPath => `${dataPath}/.beancount-ns/acc
 const getLedgerTransactionTemplateFilePath = dataPath => `${dataPath}/.beancount-ns/transaction_template.json`
 
 const getCommodityPriceFile = dataPath => `${dataPath}/price/prices.bean`
+const getMonthsFilePath = dataPath => `${dataPath}/month/months.bean`
 
 
 module.exports = {
   getLedgerConfigFilePath,
   getLedgerAccountTypesFilePath,
   getCommodityPriceFile,
-  getLedgerTransactionTemplateFilePath
+  getLedgerTransactionTemplateFilePath,
+  getMonthsFilePath
 }
