@@ -66,8 +66,25 @@
 
     > 该方式暂不支持修改项目的默认使用配置
 
+    ```yml
+    version: "3.9"
+    services:
+    app:
+       container_name: beancount-ns
+       image: xdbin/beancount-ns:1.0.1
+       ports:
+          - "10000:3001"
+       # volumes 挂载目录会导 /app/public/icons 中的图标被覆盖，这里将默认图标在挂载后重新拷贝图标
+       command: >
+          sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
+       volumes:
+          - "${dataPath:-/data/beancount}:/beancount"
+          - "${dataPath:-/data/beancount}/icons:/app/public/icons"
+    ```
+
+    创建 `docker-compose.yml` 将上面内容，拷贝进入文件，在该文件目录下执行：
+
     ```bash
-    docker pull xdbin/beancount-ns:latest
     # dataPath为beancount文件存放路径，默认 /data/beancount
     # 默认端口号 10000
     export dataPath=/data/beancount && docker-compose up -d
