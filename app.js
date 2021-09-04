@@ -144,7 +144,7 @@ const registerRoute = (router, Config) => {
     });
   })
 
-  // 关闭账户
+  // 平衡账户
   router.post('/auth/account/balance', function (req, res) {
     const { account, amount } = req.query;
     if (isBlank(account) || isBlank(amount) || !validateAccount(req.ledgerConfig, account)) {

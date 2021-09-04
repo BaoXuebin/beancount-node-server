@@ -17,21 +17,26 @@ const getLatest100Payee = (config) => {
 const addEntry = (config, entry) => {
   let { date, payee, desc, entries } = entry
   let str = `\r\n${date} * "${payee || ''}" "${desc}"`;
+  let autoBalance = false;
   entries.forEach(e => {
     const { account, amount, commodity, price, priceCommodity } = e
     str += `\r\n  ${account} ${Number(amount).toFixed(2)} ${commodity}`
     // 不涉及币种转换
     if (priceCommodity && commodity !== priceCommodity) {
+      autoBalance = true
       if (amount >= 0) {
         str += ` {${price} ${priceCommodity}, ${date}}`
       } else {
         str += ` @ ${price} ${priceCommodity}`
       }
-      // 平衡小数点误差
-      str += `\r\n  Equity:OpeningBalances`
       fs.appendFileSync(getCommodityPriceFile(config.dataPath), `\r\n${date} price ${commodity} ${price} ${priceCommodity}`)
     }
   })
+  if (autoBalance) {
+    // 平衡小数点误差
+    str += `\r\n  Equity:OpeningBalances`
+  }
+
   const transactionMonth = dayjs(date).format("YYYY-MM");
   const monthBeanFile = `${config.dataPath}/month/${transactionMonth}.bean`;
   // 月度账单不存在，则创建

@@ -1,9 +1,9 @@
 const fs = require('fs');
 const process = require('child_process')
 const Cache = require('./cache');
-const { getAccountCata, getAccountTypeDict, commentAccount, getCommoditySymbol } = require('./utils');
+const { getAccountCata, getAccountTypeDict, commentAccount, getCommoditySymbol, log } = require('./utils');
 const dayjs = require('dayjs');
-const { getLedgerAccountTypesFilePath } = require('./path');
+const { getLedgerAccountTypesFilePath, getMonthsFilePath } = require('./path');
 
 const getAllValidAcount = (config) => {
   return Cache.Accounts[config.id].filter(acc => !acc.endDate).sort()
@@ -93,10 +93,20 @@ const closeAccount = (config, account, date) => {
 }
 
 const balanceAccount = (config, account, date, amount) => {
-  const month = dayjs(date).format('YYYY-MM');
-  const yesterday = dayjs(date).add(-1, 'day').format('YYYY-MM-DD');
-  const str = `${yesterday} pad ${account} Equity:OpeningBalances\r\n${date} balance ${account} ${amount} ${config.operatingCurrency}\r\n`
-  fs.appendFileSync(`${config.dataPath}/month/${month}.bean`, `\r\n${str}`)
+  const arr = Cache.Accounts[config.id].filter(acc => acc.account === account)
+  if (arr && arr.length > 0) {
+    const month = dayjs(date).format('YYYY-MM');
+    const yesterday = dayjs(date).add(-1, 'day').format('YYYY-MM-DD');
+    const str = `\r\n${yesterday} pad ${account} Equity:OpeningBalances\r\n${date} balance ${account} ${amount} ${arr[0].commodity}\r\n`
+
+    const beanFilePath = `${config.dataPath}/month/${month}.bean`
+    if (!fs.existsSync(beanFilePath)) {
+      fs.appendFileSync(getMonthsFilePath(config.dataPath), `\r\ninclude "./${month}.bean"`)
+    }
+    fs.appendFileSync(beanFilePath, `\r\n${str}`)
+
+    log(config.mail, `balance account: ${str}`);
+  }
 
   return { account, date, amount }
 }
