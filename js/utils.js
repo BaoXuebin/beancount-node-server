@@ -94,7 +94,7 @@ const getCommoditySymbol = commodity => {
   } else if (commodity === 'USD') {
     return '$'
   }
-  return commodity
+  return ''
 }
 
 const ignoreInvalidChar = rawStr => rawStr ? rawStr.replace(/("|\\)*/g, '') : ''

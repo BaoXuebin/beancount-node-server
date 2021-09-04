@@ -1,7 +1,7 @@
 const dayjs = require('dayjs');
 const fs = require('fs');
 const process = require('child_process');
-const { getSha1Str, getCommoditySymbol } = require('./utils');
+const { getSha1Str, getCommoditySymbol, log } = require('./utils');
 const { getCommodityPriceFile, getLedgerTransactionTemplateFilePath, getMonthsFilePath } = require('./path');
 
 const getLatest100Payee = (config) => {
@@ -106,6 +106,61 @@ const listItemByCondition = (config, { type, year, month }) => {
   }).filter(a => a).reverse()
 }
 
+const listAccountTransaction = (config, account) => {
+  const bql = `select id, '\\', date, '\\', payee, '\\', narration, '\\', position, '\\', cost_number, '\\', cost(position), '\\', value(position), '\\' where account = '${account}' order by date desc limit 100;`
+  const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
+  log(config.mail, cmd)
+  const bqlResult = process.execSync(cmd).toString()
+  const bqlResultSet = bqlResult.split('\n').splice(2);
+  return bqlResultSet.filter(r => r).map(r => {
+    // 去除币种转换的大括号 {}
+    const rArray = r.trim().replace(/\{(.+?)\}/, '').split('\\').map(a => a.trim())
+    const amountAndCommodity = rArray[4].split(/\s+/)
+    const costAmountAndCommodity = rArray[6].split(/\s+/)
+    const marketAmountAndCommodity = rArray[7].split(/\s+/)
+    let result = {
+      id: rArray[0],
+      date: rArray[1],
+      payee: rArray[2],
+      desc: rArray[3],
+    }
+    // 汇率
+    if (rArray[5]) {
+      result['costPrice'] = rArray[5]
+    }
+    if (amountAndCommodity) {
+      if (amountAndCommodity[0]) {
+        result['amount'] = amountAndCommodity[0]
+      }
+      if (amountAndCommodity[1]) {
+        result['commodity'] = amountAndCommodity[1]
+        result['commoditySymbol'] = getCommoditySymbol(amountAndCommodity[1])
+      }
+    }
+    // 成本价
+    if (costAmountAndCommodity) {
+      if (costAmountAndCommodity[0]) {
+        result['costAmount'] = costAmountAndCommodity[0]
+      }
+      if (costAmountAndCommodity[1]) {
+        result['costCommodity'] = costAmountAndCommodity[1]
+        result['costCommoditySymbol'] = getCommoditySymbol(costAmountAndCommodity[1])
+      }
+    }
+    // 市场价
+    if (marketAmountAndCommodity) {
+      if (marketAmountAndCommodity[0]) {
+        result['marketAmount'] = marketAmountAndCommodity[0]
+      }
+      if (marketAmountAndCommodity[1]) {
+        result['marketCommodity'] = marketAmountAndCommodity[1]
+        result['marketCommoditySymbol'] = getCommoditySymbol(marketAmountAndCommodity[1])
+      }
+    }
+    return result
+  }).filter(a => a)
+}
+
 const execCmd = cmd => process.execSync(cmd).toString()
 
 const getTransactionTemplate = (config) => {
@@ -141,6 +196,7 @@ module.exports = {
   getLatest100Payee,
   addEntry,
   listItemByCondition,
+  listAccountTransaction,
   execCmd,
   addTransactionTemplate,
   getTransactionTemplate,

@@ -2,7 +2,7 @@ const express = require('express')
 const fs = require('fs')
 const { isBlank, validateAccount, validateAccountType, validateAccountCloseDate, isBalance, isMailAndSecretMatch, inWhiteList } = require('./js/validate')
 const { getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, balanceAccount, getAllAcountTypes } = require('./js/account_service')
-const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
+const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, listAccountTransaction, execCmd } = require('./js/api')
 const { getLedgerList, newLedger } = require('./js/ledger')
 const { statsTotalAmount, statsSubAccountPercent, statsAccountTrend, statsLedgerMonths, statsPayee, statsMonthIncomeExpenses } = require('./js/stats')
 const { dirFile, readFile, writeFile } = require('./js/source_file')
@@ -181,6 +181,16 @@ const registerRoute = (router, Config) => {
       res.json(badRequest())
     } else {
       res.json(ok(listItemByCondition(req.ledgerConfig, { type, year, month })))
+    }
+  })
+
+  // 查询账户变动记录
+  router.get('/auth/account/transaction', function (req, res) {
+    const { account } = req.query;
+    if (isBlank(account)) {
+      res.json(badRequest())
+    } else {
+      res.json(ok(listAccountTransaction(req.ledgerConfig, account)))
     }
   })
 
