@@ -1,7 +1,8 @@
 const dayjs = require('dayjs');
 const fs = require('fs');
 const process = require('child_process');
-const { getSha1Str } = require('./utils');
+const { getSha1Str, getCommoditySymbol } = require('./utils');
+const { getCommodityPriceFile, getLedgerTransactionTemplateFilePath } = require('./path');
 
 const getLatest100Payee = (config) => {
   let bql = 'SELECT distinct payee order by date desc limit 100';
@@ -17,7 +18,19 @@ const addEntry = (config, entry) => {
   let { date, payee, desc, entries } = entry
   let str = `\r\n${date} * "${payee || ''}" "${desc}"`;
   entries.forEach(e => {
-    str += `\r\n  ${e.account} ${Number(e.amount).toFixed(2)} ${config.operatingCurrency}`
+    const { account, amount, commodity, price, priceCommodity } = e
+    str += `\r\n  ${account} ${Number(amount).toFixed(2)} ${commodity}`
+    // 不涉及币种转换
+    if (priceCommodity && commodity !== priceCommodity) {
+      if (amount >= 0) {
+        str += ` {${price} ${priceCommodity}, ${date}}`
+      } else {
+        str += ` @ ${price} ${priceCommodity}`
+      }
+      // 平衡小数点误差
+      str += `\r\n  Equity:OpeningBalances`
+      fs.appendFileSync(getCommodityPriceFile(config.dataPath), `\r\n${date} price ${commodity} ${price} ${priceCommodity}`)
+    }
   })
   const transactionMonth = dayjs(date).format("YYYY-MM");
   const monthBeanFile = `${config.dataPath}/month/${transactionMonth}.bean`;
@@ -58,7 +71,8 @@ const listItemByCondition = (config, { type, year, month }) => {
         desc: rArray[3],
         account: rArray[4],
         amount: rArray[5],
-        operatingCurrency: rArray[6]
+        commodity: rArray[6],
+        commoditySymbol: getCommoditySymbol(rArray[6])
       }
     } else if (rArray.length === 6) {
       return {
@@ -68,7 +82,8 @@ const listItemByCondition = (config, { type, year, month }) => {
         desc: rArray[2],
         account: rArray[3],
         amount: rArray[4],
-        operatingCurrency: rArray[5]
+        commodity: rArray[5],
+        commoditySymbol: getCommoditySymbol(rArray[5])
       }
     } else if (rArray.length > 7) { // narration 含有空格
       return {
@@ -78,7 +93,8 @@ const listItemByCondition = (config, { type, year, month }) => {
         desc: rArray.slice(3, rArray.length - 3).join(' '),
         account: rArray[rArray.length - 3],
         amount: rArray[rArray.length - 2],
-        operatingCurrency: rArray[rArray.length - 1]
+        commodity: rArray[rArray.length - 1],
+        commoditySymbol: getCommoditySymbol(rArray[rArray.length - 1])
       }
     }
     return null;
@@ -88,7 +104,7 @@ const listItemByCondition = (config, { type, year, month }) => {
 const execCmd = cmd => process.execSync(cmd).toString()
 
 const getTransactionTemplate = (config) => {
-  const transactionTemplateFIlePath = `${config.dataPath}/transaction_template.json`
+  const transactionTemplateFIlePath = getLedgerTransactionTemplateFilePath(config.dataPath)
   if (!fs.existsSync(transactionTemplateFIlePath)) {
     return []
   }
@@ -97,7 +113,7 @@ const getTransactionTemplate = (config) => {
 
 const addTransactionTemplate = (config, template) => {
   template.id = getSha1Str(String(new Date().getTime()))
-  const transactionTemplateFIlePath = `${config.dataPath}/transaction_template.json`
+  const transactionTemplateFIlePath = getLedgerTransactionTemplateFilePath(config.dataPath)
   let oldTemplates = [];
   if (fs.existsSync(transactionTemplateFIlePath)) {
     oldTemplates = JSON.parse(fs.readFileSync(transactionTemplateFIlePath) || '[]')
@@ -109,7 +125,7 @@ const addTransactionTemplate = (config, template) => {
 }
 
 const deleteTransactionTemplate = (config, templateId) => {
-  const transactionTemplateFIlePath = `${config.dataPath}/transaction_template.json`
+  const transactionTemplateFIlePath = getLedgerTransactionTemplateFilePath(config.dataPath)
   let oldTemplates = JSON.parse(fs.readFileSync(transactionTemplateFIlePath) || '[]')
   oldTemplates = oldTemplates.filter(template => template.id !== templateId)
   fs.writeFileSync(transactionTemplateFIlePath, JSON.stringify(oldTemplates))

@@ -30,9 +30,14 @@ const validateAccountType = (type) => {
 const isBalance = (entries) => {
   let sum = Decimal(0);
   entries.forEach(e => {
-    sum = sum.plus(Decimal(e.amount))
+    const { amount, commodity, price, priceCommodity } = e
+    if (priceCommodity && priceCommodity !== commodity) {
+      sum = sum.plus(Decimal(amount).mul(Decimal(price)))
+    } else {
+      sum = sum.plus(Decimal(amount))
+    }
   })
-  return Number(sum) === 0
+  return Number(sum) < 0.01
 }
 
 const validateAccountCloseDate = (config, account, date) => {

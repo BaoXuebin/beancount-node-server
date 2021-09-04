@@ -1,7 +1,7 @@
 const express = require('express')
 const fs = require('fs')
 const { isBlank, validateAccount, validateAccountType, validateAccountCloseDate, isBalance, isMailAndSecretMatch, inWhiteList } = require('./js/validate')
-const { initAccountCache, getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, balanceAccount, getAllAcountTypes, initAccountTypesCache } = require('./js/account_service')
+const { getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, balanceAccount, getAllAcountTypes } = require('./js/account_service')
 const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, execCmd } = require('./js/api')
 const { getLedgerList, newLedger } = require('./js/ledger')
 const { statsTotalAmount, statsSubAccountPercent, statsAccountTrend, statsLedgerMonths, statsPayee, statsMonthIncomeExpenses } = require('./js/stats')
@@ -9,10 +9,11 @@ const { dirFile, readFile, writeFile } = require('./js/source_file')
 const { json } = require('express')
 const Cache = require('./js/cache')
 const Config = require('./config/config.json')
-const { ignoreInvalidCharAndBlank, ignoreInvalidChar, getAccountType } = require('./js/utils')
+const { ignoreInvalidCharAndBlank, ignoreInvalidChar, getAccountType, getAllDirFiles } = require('./js/utils')
 const { getLedgerConfigFilePath } = require('./js/path')
 const dayjs = require('dayjs')
 const multer = require('multer')
+const { initLedgerStructure, initAccountCache } = require('./js/init')
 
 const app = express()
 const port = 3001
@@ -100,13 +101,14 @@ router.post('/auth/account/type', function (req, res) {
 router.post('/auth/account', function (req, res) {
   const date = req.query.date;
   const account = ignoreInvalidCharAndBlank(req.query.account)
+  const commodity = ignoreInvalidCharAndBlank(req.query.commodity)
   if (!validateAccount(req.ledgerConfig, account)) {
     // 无效账户
     res.json(error(1003))
-  } else if (isBlank(account) || isBlank(date)) {
+  } else if (isBlank(account) || isBlank(date) || isBlank(commodity)) {
     res.json(badRequest())
   } else {
-    res.json(ok(addAccount(req.ledgerConfig, account, date)))
+    res.json(ok(addAccount(req.ledgerConfig, account, commodity, date)))
   }
 })
 
@@ -277,7 +279,6 @@ router.get('/auth/stats/month/incomeExpenses', function (req, res) {
   res.json(ok(statsMonthIncomeExpenses(req.ledgerConfig)))
 })
 
-
 app.listen(port, '0.0.0.0', () => {
   const ledgerConfigFilePath = getLedgerConfigFilePath(Config.dataPath)
   if (fs.existsSync(ledgerConfigFilePath)) {
@@ -285,11 +286,17 @@ app.listen(port, '0.0.0.0', () => {
     console.log('Success init cache: [ledger config]')
   } else {
     Cache.LedgerConfig = {}
+    fs.writeFileSync(ledgerConfigFilePath, '{}')
+    console.log('Success create file: ' + ledgerConfigFilePath)
     console.log('Success init cache: [ledger config]')
   }
+
+  const { dirs, files } = getAllDirFiles('./example')
   Object.values(Cache.LedgerConfig).forEach(config => {
-    initAccountCache(config)
-    initAccountTypesCache(config)
+    // 初始化 beancount 账本文件结构
+    initLedgerStructure(config, './example', dirs, files);
+    // 初始化 account 和 accountType 缓存
+    initAccountCache(config);
   })
   console.log(`Beancount node server listening at http://localhost:${port}`)
 })

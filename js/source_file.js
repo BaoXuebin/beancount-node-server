@@ -1,6 +1,6 @@
 const fs = require('fs')
 const RootConfig = require('../config/config.json')
-const { initAccountCache, initAccountTypesCache } = require('./account_service')
+const { initAccountCache } = require('./init')
 
 const dirFile = (config) => {
   const files = getFilePathFromDir(config.dataPath)
@@ -41,7 +41,6 @@ const writeFile = (config, path, content) => {
   fs.writeFileSync(`${config.dataPath}/${path}`, content)
 
   initAccountCache(config);
-  initAccountTypesCache(config);
 }
 
 module.exports = {

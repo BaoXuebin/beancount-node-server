@@ -8,6 +8,7 @@ RUN pip3 install beancount -i https://pypi.tuna.tsinghua.edu.cn/simple
 WORKDIR /app
 COPY package* yarn.lock server.js ./
 COPY config ./config
+COPY example ./example
 COPY js ./js
 COPY public/icons ./public/default_icons
 COPY public ./public

@@ -1,7 +1,7 @@
 const process = require('child_process');
 
 const statsTotalAmount = (config, year, month) => {
-  let bql = 'SELECT root(account, 1), sum(position)';
+  let bql = `SELECT root(account, 1), sum(convert(value(position), '${config.operatingCurrency}'))`;
   if (year) {
     bql += `FROM year = ${year}`
   }
@@ -24,9 +24,9 @@ const statsSubAccountPercent = (config, prefix, year, month, level) => {
   let bql;
   if (level) {
     const subAccountLevel = prefix.split(':').filter(a => a).length + Number(level)
-    bql = `SELECT root(account, ${subAccountLevel}) as subAccount, sum(position) WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? 'AND month = ' + month : ''} GROUP BY subAccount`;
+    bql = `SELECT root(account, ${subAccountLevel}) as subAccount, sum(convert(value(position), '${config.operatingCurrency}')) WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? 'AND month = ' + month : ''} GROUP BY subAccount`;
   } else {
-    bql = `SELECT account, sum(position) WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? 'AND month = ' + month : ''} GROUP BY account`;
+    bql = `SELECT account, sum(convert(value(position), '${config.operatingCurrency}')) WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? 'AND month = ' + month : ''} GROUP BY account`;
   }
   const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
@@ -47,10 +47,10 @@ const statsSubAccountPercent = (config, prefix, year, month, level) => {
 const statsAccountTrend = (config, prefix, year, month, type) => {
   let queryAmount, grouBy
   if (type === 'avg') {
-    queryAmount = 'sum(position) as total'
+    queryAmount = `sum(convert(value(position), '${config.operatingCurrency}')) as total`
     grouBy = 'GROUP BY date'
   } else if (type === 'sum') {
-    queryAmount = 'balance'
+    queryAmount = `convert(balance, '${config.operatingCurrency}')`
     grouBy = ''
   } else {
     return []
@@ -82,8 +82,8 @@ const statsLedgerMonths = (config) => {
 }
 
 const statsPayee = (config, prefix, year, month, type) => {
-  let bql = `SELECT payee, count(payee) as count, sum(position) WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? ' AND month = ' + month : ''} GROUP BY payee`
-  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
+  let bql = `SELECT payee, count(payee) as count, sum(convert(value(position), '${config.operatingCurrency}')) WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? ' AND month = ' + month : ''} GROUP BY payee`
+  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.map(r => {
     const arr = r.trim().split(/\s+/)
@@ -107,8 +107,8 @@ const statsPayee = (config, prefix, year, month, type) => {
 }
 
 const statsMonthIncomeExpenses = (config) => {
-  let monthIncomeBql = `SELECT year, month, neg(sum(position)) WHERE account ~ 'Income' group by year, month order by year, month`
-  let monthExpensesBql = `SELECT year, month, sum(position) WHERE account ~ 'Expenses' group by year, month order by year, month`
+  let monthIncomeBql = `SELECT year, month, neg(sum(convert(value(position), 'CNY'))) WHERE account ~ 'Income' group by year, month order by year, month`
+  let monthExpensesBql = `SELECT year, month, sum(convert(value(position), 'CNY')) WHERE account ~ 'Expenses' group by year, month order by year, month`
   const bqls = [monthIncomeBql, monthExpensesBql]
   let [income, expenses] = bqls.map(bql => {
     const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
