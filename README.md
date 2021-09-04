@@ -53,7 +53,7 @@
    
    ```bash
    # 打包镜像
-   docker build -t xdbin/beancount-ns:latest .
+   docker build -t xdbin/beancount-ns:1.0.1 .
    # 启动
    # 默认端口号 10000
    export dataPath=/data/beancount && docker-compose up -d
@@ -61,8 +61,8 @@
 
 2. 拉取仓库镜像  
 
-    ![docker image version](https://img.shields.io/docker/v/xdbin/beancount-ns/latest?label=docker%20image%20tag)
-    ![docker image size](https://img.shields.io/docker/image-size/xdbin/beancount-ns/latest?label=docker%20image%20size)
+    ![docker image version](https://img.shields.io/docker/v/xdbin/beancount-ns/1.0.1?label=docker%20image%20tag)
+    ![docker image size](https://img.shields.io/docker/image-size/xdbin/beancount-ns/1.0.1?label=docker%20image%20size)
 
     > 该方式暂不支持修改项目的默认使用配置
 
