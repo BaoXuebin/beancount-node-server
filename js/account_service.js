@@ -61,7 +61,7 @@ const addAccount = (config, account, commodity, date) => {
   if (existAccount) { // 之前存在该账户
     date = existAccount.startDate
     delete existAccount.endDate;
-    commentAccount(account, ' close ')
+    commentAccount(config, account, ' close ')
   } else {
     Cache.Accounts[config.id].push({ account, startDate: date, commodity })
     const str = `${date} open ${account} ${commodity}`

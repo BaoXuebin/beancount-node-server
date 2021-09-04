@@ -1,5 +1,4 @@
 const fs = require('fs')
-const RootConfig = require('../config/config.json')
 const { initAccountCache } = require('./init')
 
 const dirFile = (config) => {
@@ -26,7 +25,7 @@ const readFile = (config, path) => {
 }
 
 const writeFile = (config, path, content) => {
-  if (RootConfig.isBak) {
+  if (config.isBak) {
     const filePath = `${config.dataPath}/${path}`
     const bakParentFile = `${config.dataPath}/bak`
     if (!fs.existsSync(bakParentFile)) {

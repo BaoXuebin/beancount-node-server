@@ -1,1 +1,1 @@
-%startDate% open Equity:OpeningBalances CNY
+%startDate% open Equity:OpeningBalances %operatingCurrency%

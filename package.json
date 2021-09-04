@@ -1,21 +1,28 @@
 {
   "name": "beancount-node-server",
   "version": "1.1.0",
-  "description": "Api service for beancount",
+  "description": "RSETful api service for beancount",
+  "homepage": "https://github.com/BaoXuebin/beancount-node-server",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "bin": {
+    "beancount-ns": "./script.js"
+  },
+  "keywords": [
+    "beancount",
+    "node"
+  ],
+  "author": "BaoXuebin",
   "license": "MIT",
   "dependencies": {
     "child_process": "^1.0.2",
+    "commander": "^8.1.0",
     "crypto": "^1.0.1",
     "dayjs": "^1.10.6",
     "decimal.js": "^10.3.1",
     "express": "^4.17.1",
-    "iconv-lite": "^0.6.3",
     "multer": "^1.4.3"
   }
 }
