@@ -1,5 +1,5 @@
 {
-  "name": "beancount-node-server",
+  "name": "beancount-ns",
   "version": "1.1.0",
   "description": "RSETful api service for beancount",
   "homepage": "https://github.com/BaoXuebin/beancount-node-server",
@@ -24,5 +24,8 @@
     "decimal.js": "^10.3.1",
     "express": "^4.17.1",
     "multer": "^1.4.3"
+  },
+  "publishConfig": {
+    "registry": "http://registry.npmjs.org"
   }
 }
