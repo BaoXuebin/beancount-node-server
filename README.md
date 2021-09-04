@@ -21,7 +21,7 @@
 - [X] 账户管理
 - [X] 资产管理
 - [X] 统计图表
-- [ ] 多币种
+- [X] 多币种(v1.1.0)
 - [ ] 标签
 - [ ] 事件
 - [ ] 投资管理
@@ -47,42 +47,66 @@
    node server.js
    ```
 6. 访问 `http://localhost:3001`
+
+## NPM Package
+
+1. 安装 [Node](https://nodejs.org/en/download/)  
+2. 安装 [python3](https://www.python.org/downloads/)  
+3. 安装 beancount  
+    ```bash
+    pip3 install beancount -i  https://pypi.tuna.tsinghua.edu.cn/simple
+    ```
+4. 全局安装 package
+	```bash
+	npm install beancount-ns -g
+	```
+5. `beancount-ns start` 启动服务
+	```bash
+    beancount-ns -h 查看帮助  
+	beancount-ns -v 版本信息  
+
+	# 自定义参数
+    -p 端口号，，默认 3001
+	-dp dataPath 路径，默认 /beancount
+	-c operatingCurrency 币种，默认 CNY
+	-d startDate 账本初始时间，默认 1970-01-01
+	-b isBak 修改文件时是否自动备份，默认 true
+   	```
+6. 访问 `http://localhost:3001`
+
 ## Docker
 
-1. 本地打包镜像
-   
-   ```bash
-   # 打包镜像
-   docker build -t xdbin/beancount-ns:latest .
-   # 启动
-   # 默认端口号 10000
-   export dataPath=/data/beancount && docker-compose up -d
-   ```
+```docker
+docker run --name benacount-ns -dp 10000:3001 \
+	-w /app \
+	-v "/data/beancount:/beancount" \
+	-v "/data/beancount/icons:/app/public/icons" \
+	xdbin/beancount-ns:latest \
+	sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
+```
+
+1. 创建 `docker-compose.yml` 文件
+
+	```yml
+	version: "3.9"
+	services:
+	app:
+		container_name: beancount-ns
+		image: xdbin/beancount-ns:latest
+		ports:
+			- "10000:3001"
+		# volumes 挂载目录会导 /app/public/icons 中的图标被覆盖，这里将默认图标在挂载后重新拷贝图标
+		command: >
+			sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
+		volumes:
+			- "${dataPath:-/data/beancount}:/beancount"
+			- "${dataPath:-/data/beancount}/icons:/app/public/icons"
+	```
 
 2. 拉取仓库镜像  
 
     ![docker image version](https://img.shields.io/docker/v/xdbin/beancount-ns/latest?label=docker%20image%20tag)
     ![docker image size](https://img.shields.io/docker/image-size/xdbin/beancount-ns/latest?label=docker%20image%20size)
-
-    > 该方式暂不支持修改项目的默认使用配置
-
-    ```yml
-    version: "3.9"
-    services:
-    app:
-       container_name: beancount-ns
-       image: xdbin/beancount-ns:1.0.1
-       ports:
-          - "10000:3001"
-       # volumes 挂载目录会导 /app/public/icons 中的图标被覆盖，这里将默认图标在挂载后重新拷贝图标
-       command: >
-          sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
-       volumes:
-          - "${dataPath:-/data/beancount}:/beancount"
-          - "${dataPath:-/data/beancount}/icons:/app/public/icons"
-    ```
-
-    创建 `docker-compose.yml` 将上面内容，拷贝进入文件，在该文件目录下执行：
 
     ```bash
     # dataPath为beancount文件存放路径，默认 /data/beancount
@@ -121,17 +145,13 @@
 **operatingCurrency**: 账本币种
 **startDate**: 账本创建时间，初始化账本时使用
 
-### config/account_type.json
-
-用于对 beancount 的 account 进行归类，当创建一个账本后，会默认在账本对应目录维护一个用于该账本的 account_type.json 文件
-
-### config/init_data.json
-
-默认的 beancount 初始化 account 内容
-
 ### config/white_list.json
 
 用户白名单，默认为空，不作限制；如需限制，在该文件中添加用户名称
+
+### example/*
+
+`example` 文件下为默认账本的结构和数据，你可以根据需要自行修改，文件中的 `%startDate%` 和 `%operatingCurrency%` 程序会在用户创建账本时自动替换的账本开始时间和币种，切勿修改
 
 # 项目负责人
 
