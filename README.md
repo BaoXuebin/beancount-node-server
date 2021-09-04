@@ -76,43 +76,42 @@
 
 ## Docker
 
+![docker image version](https://img.shields.io/docker/v/xdbin/beancount-ns/latest?label=docker%20image%20tag)
+![docker image size](https://img.shields.io/docker/image-size/xdbin/beancount-ns/latest?label=docker%20image%20size)
+
 ```docker
 docker run --name benacount-ns -dp 10000:3001 \
-	-w /app \
-	-v "/data/beancount:/beancount" \
-	-v "/data/beancount/icons:/app/public/icons" \
-	xdbin/beancount-ns:latest \
-	sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
+-w /app \
+-v "/data/beancount:/beancount" \
+-v "/data/beancount/icons:/app/public/icons" \
+xdbin/beancount-ns:latest \
+sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
 ```
 
-1. 创建 `docker-compose.yml` 文件
+你也可以使用 `docker-compose` 启动镜像，创建 `docker-compose.yml` 文件（将下面的内容拷贝进文件）
 
-	```yml
-	version: "3.9"
-	services:
-	app:
-		container_name: beancount-ns
-		image: xdbin/beancount-ns:latest
-		ports:
-			- "10000:3001"
-		# volumes 挂载目录会导 /app/public/icons 中的图标被覆盖，这里将默认图标在挂载后重新拷贝图标
-		command: >
-			sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
-		volumes:
-			- "${dataPath:-/data/beancount}:/beancount"
-			- "${dataPath:-/data/beancount}/icons:/app/public/icons"
-	```
+```yml
+version: "3.9"
+services:
+app:
+	container_name: beancount-ns
+	image: xdbin/beancount-ns:latest
+	ports:
+		- "10000:3001"
+	# volumes 挂载目录会导 /app/public/icons 中的图标被覆盖，这里将默认图标在挂载后重新拷贝图标
+	command: >
+		sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
+	volumes:
+		- "${dataPath:-/data/beancount}:/beancount"
+		- "${dataPath:-/data/beancount}/icons:/app/public/icons"
+```
 
-2. 拉取仓库镜像  
+执行
 
-    ![docker image version](https://img.shields.io/docker/v/xdbin/beancount-ns/latest?label=docker%20image%20tag)
-    ![docker image size](https://img.shields.io/docker/image-size/xdbin/beancount-ns/latest?label=docker%20image%20size)
-
-    ```bash
-    # dataPath为beancount文件存放路径，默认 /data/beancount
-    # 默认端口号 10000
-    export dataPath=/data/beancount && docker-compose up -d
-    ```
+```bash
+# dataPath为beancount文件存放路径，默认 /data/beancount
+export dataPath=/data/beancount && docker-compose up -d
+```
 
 # 使用
 
@@ -122,6 +121,14 @@ docker run --name benacount-ns -dp 10000:3001 \
 2.2 **密码**主要用于加密，当然也可以不填；**密码一旦忘记不能找回**  
 1. 如果你想指定用户可用，可以在 `/config/white_list.json` 中添加用户；该文件默认为空，表示不指定用户白名单，如果该文件内容不为空，则只允许指定用户使用  
 2. 项目初始化了一些常用的账户，你可以根据自己的情况自由改动，如果你之前未使用过 beancount，[awesome-beancount](https://github.com/siddhantgoel/awesome-beancount) 这个项目能给你更多的介绍。
+
+## 旧版本数据兼容
+
+**如果你之前已经使用该项目，在使用新的版本时，需要手动同步 `index.bean` 中的内容，将之前的 include 删除，添加下面内容**
+
+```beancount
+include "./includes.bean"
+```
 
 ## 之前的 beancount 数据怎么导入？
 
