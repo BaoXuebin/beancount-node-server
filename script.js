@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const { Command } = require('commander');
 const BeancountNsApp = require('./app');
+const PackageInfo = require('./package.json')
 const Config = require('./config/config.json')
 
 const port = 3001
@@ -8,7 +9,7 @@ const program = new Command();
 
 // options
 program
-  .version('1.1.0', '-v, --version')
+  .version(PackageInfo.version, '-v, --version')
   .option('-p, --port [type]', `beancount-ns port [${port}]`)
   .option('-dp, --dataPath [type]', `config dataPath [${Config.dataPath}]`)
   .option('-c, --operatingCurrency [type]', `config operatingCurrency [${Config.operatingCurrency}]`)

@@ -6,7 +6,7 @@ RUN apt-get update || : && apt-get install python3.5 python3-pip -y
 RUN pip3 install beancount -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 WORKDIR /app
-COPY package* yarn.lock server.js ./
+COPY package* server.js app.js ./
 COPY config ./config
 COPY example ./example
 COPY js ./js
