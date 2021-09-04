@@ -94,16 +94,16 @@ sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
 version: "3.9"
 services:
 app:
-	container_name: beancount-ns
-	image: xdbin/beancount-ns:latest
-	ports:
-		- "10000:3001"
+  container_name: beancount-ns
+  image: xdbin/beancount-ns:latest
+    ports:
+	  - "10000:3001"
 	# volumes 挂载目录会导 /app/public/icons 中的图标被覆盖，这里将默认图标在挂载后重新拷贝图标
-	command: >
-		sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
-	volumes:
-		- "${dataPath:-/data/beancount}:/beancount"
-		- "${dataPath:-/data/beancount}/icons:/app/public/icons"
+  command: >
+    sh -c "cp -rn /app/public/default_icons/* /app/public/icons && node server.js"
+  volumes:
+    - "${dataPath:-/data/beancount}:/beancount"
+    - "${dataPath:-/data/beancount}/icons:/app/public/icons"
 ```
 
 执行
