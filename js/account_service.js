@@ -64,7 +64,10 @@ const addAccount = (config, account, commodity, date) => {
     commentAccount(config, account, ' close ')
   } else {
     Cache.Accounts[config.id].push({ account, startDate: date, commodity })
-    const str = `${date} open ${account} ${commodity}`
+    let str = `${date} open ${account} ${commodity}`
+    if (commodity !== config.operatingCurrency) {
+      str += ` "FIFO"`
+    }
     fs.appendFileSync(`${config.dataPath}/account/${getAccountCata(account).toLowerCase()}.bean`, `\r\n${str}`)
   }
 

@@ -3,7 +3,7 @@ const fs = require('fs');
 const process = require('child_process');
 const { getSha1Str, getCommoditySymbol, log, unicodeStr } = require('./utils');
 const { getCommodityPriceFile, getLedgerTransactionTemplateFilePath, getMonthsFilePath } = require('./path');
-const { toUnicode } = require('punycode');
+const Decimal = require('decimal.js')
 
 const getLatest100Payee = (config) => {
   let bql = 'SELECT distinct payee order by date desc limit 100';
@@ -28,7 +28,7 @@ const addEntry = (config, entry) => {
       if (amount >= 0) {
         str += ` {${price} ${priceCommodity}, ${date}}`
       } else {
-        str += ` @ ${price} ${priceCommodity}`
+        str += ` {} @ ${price} ${priceCommodity}`
       }
       fs.appendFileSync(getCommodityPriceFile(config.dataPath), `\r\n${date} price ${commodity} ${price} ${priceCommodity}`)
     }
@@ -91,7 +91,7 @@ const listItemByCondition = (config, { type, year, month }) => {
 }
 
 const listAccountTransaction = (config, account) => {
-  const bql = `select id, '\\', date, '\\', payee, '\\', narration, '\\', position, '\\', cost_number, '\\', cost(position), '\\', value(position), '\\' where account ~ '${unicodeStr(account)}' order by date desc limit 100;`
+  const bql = `select id, '\\', date, '\\', payee, '\\', narration, '\\', position, '\\', cost_number, '\\', cost(position), '\\', value(position), '\\', price, '\\'  where account ~ '${unicodeStr(account)}' order by date desc limit 100;`
   const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
   log(config.mail, cmd)
   const bqlResult = process.execSync(cmd).toString()
@@ -102,6 +102,7 @@ const listAccountTransaction = (config, account) => {
     const amountAndCommodity = rArray[4].split(/\s+/)
     const costAmountAndCommodity = rArray[6].split(/\s+/)
     const marketAmountAndCommodity = rArray[7].split(/\s+/)
+    const saleAmountAndCommodity = rArray[8].split(/\s+/)
     let result = {
       id: rArray[0],
       date: rArray[1],
@@ -131,7 +132,6 @@ const listAccountTransaction = (config, account) => {
         result['costCommoditySymbol'] = getCommoditySymbol(costAmountAndCommodity[1])
       }
     }
-    // 市场价
     if (marketAmountAndCommodity) {
       if (marketAmountAndCommodity[0]) {
         result['marketAmount'] = marketAmountAndCommodity[0]
@@ -139,6 +139,20 @@ const listAccountTransaction = (config, account) => {
       if (marketAmountAndCommodity[1]) {
         result['marketCommodity'] = marketAmountAndCommodity[1]
         result['marketCommoditySymbol'] = getCommoditySymbol(marketAmountAndCommodity[1])
+      }
+    }
+    // 卖出价格
+    if (saleAmountAndCommodity) {
+      if (saleAmountAndCommodity[0]) {
+        result['salePrice'] = saleAmountAndCommodity[0]
+        if (result['amount']) {
+          // 市场价
+          result['saleAmount'] = Decimal(result['amount']).mul(Decimal(saleAmountAndCommodity[0]))
+        }
+      }
+      if (saleAmountAndCommodity[1]) {
+        result['saleCommodity'] = saleAmountAndCommodity[1]
+        result['saleCommoditySymbol'] = getCommoditySymbol(saleAmountAndCommodity[1])
       }
     }
     return result

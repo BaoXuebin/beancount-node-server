@@ -1,15 +1,18 @@
 const process = require('child_process');
+const { log } = require('./utils')
 
 const statsTotalAmount = (config, year, month) => {
   let bql = `SELECT root(account, 1), sum(convert(value(position), '${config.operatingCurrency}'))`;
   if (year) {
-    bql += `FROM year = ${year}`
+    bql += ` FROM year = ${year}`
   }
   if (month) {
-    bql += `AND month = ${month}`
+    bql += ` AND month = ${month}`
   }
-  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
-  const bqlResultSet = bqlResult.split('\n').splice(2);
+  const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
+  const bqlResult = process.execSync(cmd).toString()
+  log(config.mail, cmd)
+  const bqlResultSet = bqlResult.split(/\n|,/).splice(2);
   let obj = {};
   bqlResultSet.forEach(r => {
     const arr = r.trim().split(/\s+/)
@@ -28,7 +31,9 @@ const statsSubAccountPercent = (config, prefix, year, month, level) => {
   } else {
     bql = `SELECT account, sum(convert(value(position), '${config.operatingCurrency}')) WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? 'AND month = ' + month : ''} GROUP BY account`;
   }
-  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
+  const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
+  const bqlResult = process.execSync(cmd).toString()
+  log(config.mail, cmd)
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.map(r => {
     const arr = r.trim().split(/\s+/)
@@ -56,7 +61,9 @@ const statsAccountTrend = (config, prefix, year, month, type) => {
     return []
   }
   let bql = `SELECT date, ${queryAmount} WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? ' AND month = ' + month : ''} ${grouBy}`
-  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
+  const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
+  const bqlResult = process.execSync(cmd).toString()
+  log(config.mail, cmd)
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.map(r => {
     const arr = r.trim().split(/\s+/)
@@ -73,7 +80,9 @@ const statsAccountTrend = (config, prefix, year, month, type) => {
 
 const statsLedgerMonths = (config) => {
   let bql = 'SELECT distinct year(date), month(date)';
-  const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
+  const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
+  const bqlResult = process.execSync(cmd).toString()
+  log(config.mail, cmd)
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.filter(a => a).map(r => {
     const arr = r.trim().split(/\s+/)
@@ -82,43 +91,41 @@ const statsLedgerMonths = (config) => {
 }
 
 const statsPayee = (config, prefix, year, month, type) => {
-  let bql = `SELECT payee, count(payee) as count, sum(convert(value(position), '${config.operatingCurrency}')) WHERE account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? ' AND month = ' + month : ''} GROUP BY payee`
-  const bqlResult = process.execSync(`bean-query ${config.dataPath}/index.bean "${bql}"`).toString()
+  let bql = `SELECT payee, count(payee), sum(convert(value(position), '${config.operatingCurrency}')) WHERE currency = '${config.operatingCurrency}' AND account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? ' AND month = ' + month : ''} GROUP BY payee`
+  const cmd = `bean-query ${config.dataPath}/index.bean "${bql}"`
+  const bqlResult = process.execSync(cmd).toString()
+  log(config.mail, cmd)
   const bqlResultSet = bqlResult.split('\n').splice(2);
   return bqlResultSet.map(r => {
     const arr = r.trim().split(/\s+/)
     let value;
     if (type === 'cot') {
-      value = Number(arr[1])
+      value = Number(arr[arr.length - 3])
     } else if (type === 'avg') {
-      value = Number((Number(arr[2]) / Number(arr[1])).toFixed(2))
+      value = Number((Number(arr[arr.length - 2]) / Number(arr[arr.length - 3])).toFixed(2))
     } else {
-      value = Number(arr[2])
+      value = Number(arr[arr.length - 2])
     }
-    if (arr.length === 4) {
-      return {
-        payee: arr[0],
-        value,
-        operatingCurrency: arr[3]
-      }
+    return {
+      payee: arr.slice(0, arr.length - 3).join(''),
+      value,
+      operatingCurrency: arr[arr.length - 1]
     }
-    return null;
   }).filter(a => a).sort((a, b) => a.value - b.value);
 }
 
 const statsMonthIncomeExpenses = (config) => {
-  let monthIncomeBql = `SELECT year, month, neg(sum(convert(value(position), 'CNY'))) WHERE account ~ 'Income' group by year, month order by year, month`
-  let monthExpensesBql = `SELECT year, month, sum(convert(value(position), 'CNY')) WHERE account ~ 'Expenses' group by year, month order by year, month`
+  let monthIncomeBql = `SELECT year, month, neg(sum(convert(value(position), '${config.operatingCurrency}'))) WHERE account ~ 'Income' group by year, month order by year, month`
+  let monthExpensesBql = `SELECT year, month, sum(convert(value(position), '${config.operatingCurrency}')) WHERE account ~ 'Expenses' group by year, month order by year, month`
   const bqls = [monthIncomeBql, monthExpensesBql]
   let [income, expenses] = bqls.map(bql => {
-    const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
+    const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
+    const bqlResult = process.execSync(cmd).toString()
+    log(config.mail, cmd)
     const bqlResultSet = bqlResult.split('\n').splice(2);
     return bqlResultSet.map(r => {
-      const arr = r.trim().split(/\s+/)
-      if (arr.length === 4) {
-        return { month: `${arr[0]}-${arr[1]}`, amount: Number(arr[2]), operatingCurrency: arr[3] }
-      }
-      return null;
+      const arr = r.trim().split(/\s+|,/)
+      return { month: `${arr[0]}-${arr[1]}`, amount: Number(arr[2]), operatingCurrency: arr[3] }
     }).filter(a => a);
   })
   const incomeResult = income.map(inc => Object.assign({ type: '收入' }, inc))

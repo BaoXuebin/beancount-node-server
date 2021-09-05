@@ -139,8 +139,6 @@ const unicodeStr = (str) => {
   }).join("");
 }
 
-console.log(unicodeStr('Assets:AA:晚餐'))
-
 module.exports = {
   readFileByLines,
   lineToMap,
