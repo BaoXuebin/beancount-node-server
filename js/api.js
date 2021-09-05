@@ -67,7 +67,6 @@ const listItemByCondition = (config, { type, year, month }) => {
   }
   const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
-  console.log(bqlResultSet)
   return bqlResultSet.filter(r => r).map(r => {
     const rArray = r.replace(/\{(.+?)\}/, '').split('\\').map(a => a.trim())
     const amountAndCommodity = rArray[5].split(/\s+/)
