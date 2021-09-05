@@ -128,6 +128,19 @@ const log = (user, content) => {
   }
 }
 
+const addZeros = str => '\\u' + ("0000" + str).slice(-4)
+
+const unicodeStr = (str) => {
+  return str.split("").map(char => {
+    if (!/^[\x00-\x7F]+$/.test(char)) {
+      return addZeros(char.charCodeAt(0).toString(16))
+    }
+    return char
+  }).join("");
+}
+
+console.log(unicodeStr('Assets:AA:晚餐'))
+
 module.exports = {
   readFileByLines,
   lineToMap,
@@ -141,5 +154,6 @@ module.exports = {
   ignoreInvalidCharAndBlank,
   getCommoditySymbol,
   getAllDirFiles,
-  log
+  log,
+  unicodeStr
 }

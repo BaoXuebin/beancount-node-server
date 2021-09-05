@@ -1,8 +1,9 @@
 const dayjs = require('dayjs');
 const fs = require('fs');
 const process = require('child_process');
-const { getSha1Str, getCommoditySymbol, log } = require('./utils');
+const { getSha1Str, getCommoditySymbol, log, unicodeStr } = require('./utils');
 const { getCommodityPriceFile, getLedgerTransactionTemplateFilePath, getMonthsFilePath } = require('./path');
+const { toUnicode } = require('punycode');
 
 const getLatest100Payee = (config) => {
   let bql = 'SELECT distinct payee order by date desc limit 100';
@@ -50,7 +51,7 @@ const addEntry = (config, entry) => {
 }
 
 const listItemByCondition = (config, { type, year, month }) => {
-  let bql = 'SELECT id, date, payee, narration, account, position';
+  let bql = `SELECT id, '\\', date, '\\', payee, '\\', narration, '\\', account, '\\', position, '\\'`;
   if (type || year || month) {
     bql += ' WHERE ';
     if (type) {
@@ -66,48 +67,32 @@ const listItemByCondition = (config, { type, year, month }) => {
   }
   const bqlResult = process.execSync(`bean-query "${config.dataPath}/index.bean" "${bql}"`).toString()
   const bqlResultSet = bqlResult.split('\n').splice(2);
+  console.log(bqlResultSet)
   return bqlResultSet.filter(r => r).map(r => {
-    const rArray = r.trim().split(/\s+/)
-    if (rArray.length === 7) {
-      return {
-        id: rArray[0],
-        date: rArray[1],
-        payee: rArray[2],
-        desc: rArray[3],
-        account: rArray[4],
-        amount: rArray[5],
-        commodity: rArray[6],
-        commoditySymbol: getCommoditySymbol(rArray[6])
+    const rArray = r.replace(/\{(.+?)\}/, '').split('\\').map(a => a.trim())
+    const amountAndCommodity = rArray[5].split(/\s+/)
+    let result = {
+      id: rArray[0],
+      date: rArray[1],
+      payee: rArray[2],
+      desc: rArray[3],
+      account: rArray[4]
+    }
+    if (amountAndCommodity) {
+      if (amountAndCommodity[0]) {
+        result['amount'] = amountAndCommodity[0]
       }
-    } else if (rArray.length === 6) {
-      return {
-        id: rArray[0],
-        date: rArray[1],
-        payee: '',
-        desc: rArray[2],
-        account: rArray[3],
-        amount: rArray[4],
-        commodity: rArray[5],
-        commoditySymbol: getCommoditySymbol(rArray[5])
-      }
-    } else if (rArray.length > 7) { // narration 含有空格
-      return {
-        id: rArray[0],
-        date: rArray[1],
-        payee: rArray[2],
-        desc: rArray.slice(3, rArray.length - 3).join(' '),
-        account: rArray[rArray.length - 3],
-        amount: rArray[rArray.length - 2],
-        commodity: rArray[rArray.length - 1],
-        commoditySymbol: getCommoditySymbol(rArray[rArray.length - 1])
+      if (amountAndCommodity[1]) {
+        result['commodity'] = amountAndCommodity[1]
+        result['commoditySymbol'] = getCommoditySymbol(amountAndCommodity[1])
       }
     }
-    return null;
+    return result;
   }).filter(a => a).reverse()
 }
 
 const listAccountTransaction = (config, account) => {
-  const bql = `select id, '\\', date, '\\', payee, '\\', narration, '\\', position, '\\', cost_number, '\\', cost(position), '\\', value(position), '\\' where account = '${account}' order by date desc limit 100;`
+  const bql = `select id, '\\', date, '\\', payee, '\\', narration, '\\', position, '\\', cost_number, '\\', cost(position), '\\', value(position), '\\' where account ~ '${unicodeStr(account)}' order by date desc limit 100;`
   const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
   log(config.mail, cmd)
   const bqlResult = process.execSync(cmd).toString()
