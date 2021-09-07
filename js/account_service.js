@@ -17,6 +17,7 @@ const getAllAccounts = (config) => {
   // 账户市场价: select account, sum(convert(value(position), 'CNY'))
   const cmd = `bean-query "${config.dataPath}/index.bean" "select account, sum(convert(value(position), '${config.operatingCurrency}'))"`
   const bqlResult = process.execSync(cmd).toString()
+  log(config.mail, cmd)
   const bqlResultSet = bqlResult.split('\n').splice(2);
   // 每个账户的金额
   const amountAccounts = bqlResultSet.map(r => {

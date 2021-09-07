@@ -92,7 +92,7 @@ const statsLedgerMonths = (config) => {
 
 const statsPayee = (config, prefix, year, month, type) => {
   let bql = `SELECT payee, count(payee), sum(convert(value(position), '${config.operatingCurrency}')) WHERE currency = '${config.operatingCurrency}' AND account ~ '${prefix}' ${year ? 'AND year = ' + year : ''} ${month ? ' AND month = ' + month : ''} GROUP BY payee`
-  const cmd = `bean-query ${config.dataPath}/index.bean "${bql}"`
+  const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
   const bqlResult = process.execSync(cmd).toString()
   log(config.mail, cmd)
   const bqlResultSet = bqlResult.split('\n').splice(2);
