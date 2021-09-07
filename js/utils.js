@@ -1,7 +1,8 @@
 const fs = require('fs')
 const crypto = require('crypto')
 const Cache = require('./cache')
-const path = require('path')
+const path = require('path');
+const dayjs = require('dayjs');
 
 // 忽略注释行
 const isCommnetLine = line => line.startsWith('* ');
@@ -121,10 +122,11 @@ const getAllDirFiles = (paretPath, childDirPath) => {
 }
 
 const log = (user, content) => {
+  const time = dayjs().format('YYYY-MM-DD HH:mm:ss.SSS')
   if (user) {
-    console.log(`[${user}] ${content}`)
+    console.log(`[${time}] [${user}] ${content}`)
   } else {
-    console.log(content)
+    console.log(`[${time}] ${content}`)
   }
 }
 
