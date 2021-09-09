@@ -1,6 +1,7 @@
 const dayjs = require('dayjs');
 const fs = require('fs');
 const process = require('child_process');
+const LedgerConfig = require('../config/config.json')
 const { getSha1Str, getCommoditySymbol, log, unicodeStr } = require('./utils');
 const { getCommodityPriceFile, getLedgerTransactionTemplateFilePath, getMonthsFilePath } = require('./path');
 const Decimal = require('decimal.js')
@@ -21,7 +22,7 @@ const addEntry = (config, entry) => {
   let autoBalance = false;
   entries.forEach(e => {
     const { account, amount, commodity, price, priceCommodity } = e
-    str += `\r\n  ${account} ${Number(amount).toFixed(2)} ${commodity}`
+    str += `\r\n  ${account} ${Number(amount).toFixed(2)} ${commodity || LedgerConfig.operatingCurrency}`
     // 不涉及币种转换
     if (priceCommodity && commodity !== priceCommodity) {
       autoBalance = true
