@@ -18,7 +18,10 @@ const getLatest100Payee = (config) => {
 
 const addEntry = (config, entry) => {
   let { date, payee, desc, entries, tags } = entry
-  let str = `\r\n${date} * "${payee || ''}" "${desc}" ${tags.map(t => `#${t}`).join(' ')}`;
+  let str = `\r\n${date} * "${payee || ''}" "${desc}"`;
+  if (tags && tags.length > 0) {
+    str += `${tags.map(t => `#${t}`).join(' ')}`
+  }
   let autoBalance = false;
   entries.forEach(e => {
     const { account, amount, commodity, price, priceCommodity } = e
