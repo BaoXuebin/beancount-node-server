@@ -17,8 +17,8 @@ const getLatest100Payee = (config) => {
 }
 
 const addEntry = (config, entry) => {
-  let { date, payee, desc, entries } = entry
-  let str = `\r\n${date} * "${payee || ''}" "${desc}"`;
+  let { date, payee, desc, entries, tags } = entry
+  let str = `\r\n${date} * "${payee || ''}" "${desc}" ${tags.map(t => `#${t}`).join(' ')}`;
   let autoBalance = false;
   entries.forEach(e => {
     const { account, amount, commodity, price, priceCommodity } = e
@@ -52,7 +52,7 @@ const addEntry = (config, entry) => {
 }
 
 const listItemByCondition = (config, { type, year, month }) => {
-  let bql = `SELECT id, '\\', date, '\\', payee, '\\', narration, '\\', account, '\\', position, '\\'`;
+  let bql = `SELECT id, '\\', date, '\\', payee, '\\', narration, '\\', account, '\\', position, '\\', tags, '\\'`;
   if (type || year || month) {
     bql += ' WHERE ';
     if (type) {
@@ -87,12 +87,21 @@ const listItemByCondition = (config, { type, year, month }) => {
         result['commoditySymbol'] = getCommoditySymbol(amountAndCommodity[1])
       }
     }
+    result['tags'] = rArray[6].split(',').filter(a => a).map(a => a.trim())
     return result;
   }).filter(a => a).reverse()
 }
 
-const listAccountTransaction = (config, account) => {
-  const bql = `select id, '\\', date, '\\', payee, '\\', narration, '\\', position, '\\', cost_number, '\\', cost(position), '\\', value(position), '\\', price, '\\'  where account ~ '${unicodeStr(account)}' order by date desc limit 100;`
+const listTransactionByCondition = (config, query) => {
+  let whereBQL = [
+    query.account ? `account ~ '${unicodeStr(query.account)}'` : '',
+    query.tag ? `'${query.tag}' in tags` : ''
+  ]
+  whereBQL = whereBQL.filter(a => a)
+  if (whereBQL.length > 0) {
+    whereBQL = ' where ' + whereBQL.join(' and ')
+  }
+  const bql = `select id, '\\', account, '\\', date, '\\', payee, '\\', narration, '\\', position, '\\', cost_number, '\\', cost(position), '\\', value(position), '\\', price, '\\', tags, '\\' ${whereBQL} order by date desc limit 100;`
   const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
   log(config.mail, cmd)
   const bqlResult = process.execSync(cmd).toString()
@@ -100,15 +109,16 @@ const listAccountTransaction = (config, account) => {
   return bqlResultSet.filter(r => r).map(r => {
     // 去除币种转换的大括号 {}
     const rArray = r.trim().replace(/\{(.+?)\}/, '').split('\\').map(a => a.trim())
-    const amountAndCommodity = rArray[4].split(/\s+/)
-    const costAmountAndCommodity = rArray[6].split(/\s+/)
-    const marketAmountAndCommodity = rArray[7].split(/\s+/)
-    const saleAmountAndCommodity = rArray[8].split(/\s+/)
+    const amountAndCommodity = rArray[5].split(/\s+/)
+    const costAmountAndCommodity = rArray[7].split(/\s+/)
+    const marketAmountAndCommodity = rArray[8].split(/\s+/)
+    const saleAmountAndCommodity = rArray[9].split(/\s+/)
     let result = {
       id: rArray[0],
-      date: rArray[1],
-      payee: rArray[2],
-      desc: rArray[3],
+      account: rArray[1],
+      date: rArray[2],
+      payee: rArray[3],
+      desc: rArray[4],
     }
     // 汇率
     if (rArray[5]) {
@@ -156,6 +166,7 @@ const listAccountTransaction = (config, account) => {
         result['saleCommoditySymbol'] = getCommoditySymbol(saleAmountAndCommodity[1])
       }
     }
+    result['tags'] = rArray[10].split(',').filter(a => a).map(a => a.trim())
     return result
   }).filter(a => a)
 }
@@ -191,13 +202,34 @@ const deleteTransactionTemplate = (config, templateId) => {
   return templateId;
 }
 
+const listAllTags = (config) => {
+  const bql = `select distinct tags`
+  const cmd = `bean-query "${config.dataPath}/index.bean" "${bql}"`
+  log(config.mail, cmd)
+  const bqlResult = process.execSync(cmd).toString()
+  const bqlResultSet = bqlResult.split('\n').splice(2);
+
+  const tagSet = new Set()
+  bqlResultSet.filter(a => a).forEach(r => {
+    // 去除币种转换的大括号 {}
+    const rArray = r.trim().split(',').map(a => a.trim())
+    for (let t of rArray) {
+      if (t) {
+        tagSet.add(t)
+      }
+    }
+  })
+  return [...tagSet]
+}
+
 module.exports = {
   getLatest100Payee,
   addEntry,
   listItemByCondition,
-  listAccountTransaction,
+  listTransactionByCondition,
   execCmd,
   addTransactionTemplate,
   getTransactionTemplate,
-  deleteTransactionTemplate
+  deleteTransactionTemplate,
+  listAllTags
 }
