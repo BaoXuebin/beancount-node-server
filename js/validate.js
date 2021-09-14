@@ -29,6 +29,10 @@ const validateAccountType = (type) => {
 
 const isBalance = (entries) => {
   let sum = Decimal(0);
+  const autoBalance = entries.filter(e => e.account === 'Equity:OpeningBalances').length > 0
+  if (autoBalance) {
+    return true;
+  }
   entries.forEach(e => {
     const { amount, commodity, price, priceCommodity } = e
     if (e.account === 'Equity:OpeningBalances') {
