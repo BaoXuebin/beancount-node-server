@@ -25,9 +25,13 @@ const addEntry = (config, entry) => {
   let autoBalance = false;
   entries.forEach(e => {
     const { account, amount, commodity, price, priceCommodity } = e
-    str += `\r\n  ${account} ${Number(amount).toFixed(2)} ${commodity || LedgerConfig.operatingCurrency}`
+    if (account === 'Equity:OpeningBalances') {
+      str += `\r\n  ${account}`
+    } else {
+      str += `\r\n  ${account} ${Number(amount).toFixed(2)} ${commodity || LedgerConfig.operatingCurrency}`
+    }
     // 不涉及币种转换
-    if (priceCommodity && commodity !== priceCommodity) {
+    if (priceCommodity && commodity !== priceCommodity && account !== 'Equity:OpeningBalances') {
       autoBalance = true
       if (amount >= 0) {
         str += ` {${price} ${priceCommodity}, ${date}}`

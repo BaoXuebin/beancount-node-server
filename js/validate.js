@@ -31,6 +31,9 @@ const isBalance = (entries) => {
   let sum = Decimal(0);
   entries.forEach(e => {
     const { amount, commodity, price, priceCommodity } = e
+    if (e.account === 'Equity:OpeningBalances') {
+      return
+    }
     if (priceCommodity && priceCommodity !== commodity) {
       sum = sum.plus(Decimal(amount).mul(Decimal(price)))
     } else {
