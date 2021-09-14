@@ -1,6 +1,6 @@
 {
   "name": "beancount-ns",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "RSETful api service for beancount",
   "homepage": "https://github.com/BaoXuebin/beancount-node-server",
   "main": "server.js",
