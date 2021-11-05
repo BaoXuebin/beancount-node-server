@@ -1,7 +1,7 @@
 const express = require('express')
 const fs = require('fs')
 const { isBlank, validateAccount, validateAccountType, validateAccountCloseDate, isBalance, isMailAndSecretMatch, inWhiteList } = require('./js/validate')
-const { getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, balanceAccount, getAllAcountTypes } = require('./js/account_service')
+const { getValidAccountLike, getAllValidAcount, getAllAccounts, addAccount, addAccountType, closeAccount, balanceAccount, syncPriceAccount, getAllAcountTypes } = require('./js/account_service')
 const { addEntry, addTransactionTemplate, getTransactionTemplate, deleteTransactionTemplate, getLatest100Payee, listItemByCondition, listTransactionByCondition, execCmd, listAllTags } = require('./js/api')
 const { getLedgerList, newLedger } = require('./js/ledger')
 const { statsTotalAmount, statsSubAccountPercent, statsAccountTrend, statsLedgerMonths, statsPayee, statsMonthIncomeExpenses } = require('./js/stats')
@@ -151,6 +151,16 @@ const registerRoute = (router, Config) => {
       res.json(badRequest())
     } else {
       res.json(ok(balanceAccount(req.ledgerConfig, account, dayjs().format('YYYY-MM-DD'), amount)))
+    }
+  })
+
+  // 同步账户净值
+  router.post('/auth/commodity/price', function (req, res) {
+    const { commodity, date, price } = req.query;
+    if (isBlank(commodity) || isBlank(price) || isBlank(date)) {
+      res.json(badRequest())
+    } else {
+      res.json(ok(syncPriceAccount(req.ledgerConfig, commodity, date, price)))
     }
   })
 

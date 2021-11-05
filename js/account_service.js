@@ -28,14 +28,14 @@ const getAllAccounts = (config) => {
     if (arr.length === 3) {
       return {
         account: arr[0],
-        amount: arr[1],
-        commodity: arr[2],
-        commoditySymbol: getCommoditySymbol(arr[2])
+        priceAmount: arr[1],
+        priceCommodity: arr[2],
+        priceCommoditySymbol: getCommoditySymbol(arr[2])
       }
     } else if (arr.length === 5) { // 包含汇率转换
       return {
         account: arr[0],
-        amount: arr[1],
+        priceAmount: arr[1],
         commodity: arr[2],
         commoditySymbol: getCommoditySymbol(arr[2]),
         price: arr[3],
@@ -51,6 +51,7 @@ const getAllAccounts = (config) => {
     acc.type = getAccountTypeDict(config, acc.account)
     if (amountAccountKeys.indexOf(acc.account) >= 0) {
       const amountAccount = amountAccounts.filter(a => a.account === acc.account)[0]
+      console.log(acc)
       return Object.assign(amountAccount, acc)
     }
     return acc
@@ -108,11 +109,17 @@ const balanceAccount = (config, account, date, amount) => {
       fs.appendFileSync(getMonthsFilePath(config.dataPath), `\r\ninclude "./${month}.bean"`)
     }
     fs.appendFileSync(beanFilePath, `\r\n${str}`)
-
     log(config.mail, `balance account: ${str}`);
   }
-
   return { account, date, amount }
+}
+
+const syncPriceAccount = (config, commodity, date, price) => {
+  const str = `\r\n${date} price ${commodity} ${price} ${config.operatingCurrency}`
+  const beanFilePath = `${config.dataPath}/price/prices.bean`
+  fs.appendFileSync(beanFilePath, `${str}`)
+  log(config.mail, `Sync ${date} commodity ${commodity} price ${price}`);
+  return { commodity, date, price }
 }
 
 const addAccountType = (config, type, name) => {
@@ -140,6 +147,7 @@ module.exports = {
   addAccount,
   closeAccount,
   balanceAccount,
+  syncPriceAccount,
   addAccountType,
   getAllAcountTypes
 }
