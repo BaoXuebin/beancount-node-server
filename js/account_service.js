@@ -51,7 +51,6 @@ const getAllAccounts = (config) => {
     acc.type = getAccountTypeDict(config, acc.account)
     if (amountAccountKeys.indexOf(acc.account) >= 0) {
       const amountAccount = amountAccounts.filter(a => a.account === acc.account)[0]
-      console.log(acc)
       return Object.assign(amountAccount, acc)
     }
     return acc
