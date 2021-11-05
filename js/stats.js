@@ -123,18 +123,19 @@ const statsMonthIncomeExpenses = (config) => {
     const bqlResult = process.execSync(cmd).toString()
     log(config.mail, cmd)
     const bqlResultSet = bqlResult.split('\n').splice(2);
-    return bqlResultSet.map(r => {
+    return bqlResultSet.filter(a => a).map(r => {
       const arr = r.trim().split(/\s+|,/)
       return { month: `${arr[0]}-${arr[1]}`, amount: Number(arr[2]), operatingCurrency: arr[3] }
-    }).filter(a => a);
+    });
   })
+  console.log(income)
   const incomeResult = income.map(inc => Object.assign({ type: '收入' }, inc))
   const expensesResult = expenses.map(exp => Object.assign({ type: '支出' }, exp))
   const balanceResult = income.map(inc => {
     const filterArr = expenses.filter(exp => inc.month === exp.month)
     if (filterArr && filterArr.length > 0) {
-      inc.amount = Number((inc.amount - filterArr[0].amount).toFixed(2))
       inc.type = '结余'
+      inc.amount = Number((inc.amount - filterArr[0].amount).toFixed(2))
     }
     return inc
   })
